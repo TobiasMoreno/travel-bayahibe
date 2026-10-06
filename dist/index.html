@@ -1,0 +1,505 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Todo lo importante para nuestro viaje a Bayahíbe en abril de 2027: vuelos, hotel, costos y pagos." />
+    <title>Bayahíbe 2027 · El viaje</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23071f2d'/%3E%3Cpath d='M14 41c9-4 14-3 22 1 7 3 11 3 16 0' fill='none' stroke='%234ad6cf' stroke-width='5' stroke-linecap='round'/%3E%3Cpath d='M31 40V15m0 3c-8 2-12 7-13 13 7-4 11-5 13-4m1-9c7 1 12 6 14 12-7-3-11-4-14-2' fill='none' stroke='%23ffb15b' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" />
+    <style>
+      :root {
+        --ink: #071f2d;
+        --ink-soft: #24404c;
+        --sea: #25bdb7;
+        --sea-light: #bcece6;
+        --sun: #ffb15b;
+        --coral: #f15f4b;
+        --sand: #f6f1e7;
+        --paper: #fffdf7;
+        --line: rgba(7, 31, 45, 0.14);
+        --shadow: 0 24px 70px rgba(7, 31, 45, 0.14);
+      }
+
+      * { box-sizing: border-box; }
+      html { scroll-behavior: smooth; }
+      body {
+        margin: 0;
+        background: var(--sand);
+        color: var(--ink);
+        font-family: "Manrope", sans-serif;
+        font-size: 16px;
+        line-height: 1.6;
+      }
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        opacity: .055;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.6'/%3E%3C/svg%3E");
+        z-index: 20;
+      }
+      img { display: block; max-width: 100%; }
+      a { color: inherit; }
+      button, input { font: inherit; }
+      button, a { -webkit-tap-highlight-color: transparent; }
+
+      .shell { width: min(1180px, calc(100% - 40px)); margin-inline: auto; }
+      .skip-link { position: fixed; left: 16px; top: -80px; z-index: 100; background: white; padding: 10px 14px; }
+      .skip-link:focus { top: 16px; }
+      .nav {
+        position: absolute;
+        inset: 0 0 auto;
+        z-index: 5;
+        color: white;
+      }
+      .nav-inner { height: 86px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,.28); }
+      .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; font-weight: 800; letter-spacing: .02em; }
+      .brand-mark { width: 36px; height: 36px; display: grid; place-items: center; border: 1px solid rgba(255,255,255,.5); border-radius: 50%; color: var(--sun); }
+      .nav-links { display: flex; gap: 28px; align-items: center; }
+      .nav-links a { color: rgba(255,255,255,.88); text-decoration: none; font-size: .92rem; font-weight: 600; }
+      .nav-links a:hover { color: white; }
+
+      .hero {
+        position: relative;
+        min-height: 750px;
+        display: grid;
+        align-items: end;
+        overflow: hidden;
+        background: var(--ink);
+        color: white;
+      }
+      .hero-photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 45%; opacity: .82; transform: scale(1.02); animation: settle 1.8s cubic-bezier(.2,.8,.2,1) both; }
+      .hero::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(4,25,38,.94) 0%, rgba(4,25,38,.78) 42%, rgba(4,25,38,.1) 78%), linear-gradient(0deg, rgba(4,25,38,.72), transparent 54%); }
+      .hero-grid { position: relative; z-index: 2; padding: 175px 0 72px; display: grid; grid-template-columns: 1.1fr .9fr; gap: 64px; align-items: end; }
+      .eyebrow { display: inline-flex; align-items: center; gap: 9px; text-transform: uppercase; letter-spacing: .13em; font-size: .76rem; font-weight: 800; }
+      .eyebrow::before { content: ""; width: 34px; height: 2px; background: var(--sun); }
+      h1, h2, h3 { margin: 0; line-height: 1.05; }
+      h1 { margin-top: 22px; font-family: "Fraunces", serif; font-size: clamp(4rem, 9vw, 8.2rem); letter-spacing: -.055em; max-width: 760px; }
+      .hero-lede { max-width: 570px; margin: 26px 0 0; font-size: clamp(1rem, 1.8vw, 1.22rem); color: rgba(255,255,255,.82); }
+      .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 32px; }
+      .button { display: inline-flex; align-items: center; justify-content: center; min-height: 49px; padding: 0 20px; border: 1px solid transparent; border-radius: 999px; text-decoration: none; font-weight: 800; cursor: pointer; transition: transform .2s, background .2s, border-color .2s; }
+      .button:hover { transform: translateY(-2px); }
+      .button-primary { background: var(--sun); color: var(--ink); }
+      .button-secondary { color: white; border-color: rgba(255,255,255,.45); background: rgba(255,255,255,.05); backdrop-filter: blur(9px); }
+      .trip-stamp { justify-self: end; width: 280px; padding: 26px; border: 1px solid rgba(255,255,255,.35); background: rgba(7,31,45,.3); backdrop-filter: blur(12px); transform: rotate(2deg); }
+      .stamp-number { font-family: "Fraunces", serif; font-size: 4.7rem; line-height: .9; color: var(--sun); }
+      .stamp-label { margin-top: 8px; text-transform: uppercase; letter-spacing: .12em; font-size: .76rem; font-weight: 800; }
+      .stamp-dates { margin-top: 25px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,.25); font-weight: 700; }
+
+      .marquee { background: var(--sea); color: var(--ink); overflow: hidden; border-bottom: 1px solid var(--ink); }
+      .marquee-track { display: flex; width: max-content; animation: marquee 30s linear infinite; }
+      .marquee span { padding: 13px 28px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; font-size: .75rem; white-space: nowrap; }
+      .marquee span::after { content: "✦"; margin-left: 56px; }
+
+      .section { padding: 106px 0; }
+      .section-head { display: grid; grid-template-columns: .7fr 1.3fr; gap: 40px; align-items: start; margin-bottom: 52px; }
+      .kicker { color: var(--coral); text-transform: uppercase; letter-spacing: .14em; font-size: .75rem; font-weight: 800; }
+      h2 { font-family: "Fraunces", serif; font-size: clamp(2.7rem, 5vw, 5.1rem); letter-spacing: -.04em; max-width: 780px; }
+      .section-note { max-width: 560px; margin: 18px 0 0; color: var(--ink-soft); }
+
+      .facts { display: grid; grid-template-columns: repeat(4, 1fr); border: 1px solid var(--line); background: var(--paper); box-shadow: var(--shadow); }
+      .fact { padding: 28px; min-height: 170px; border-right: 1px solid var(--line); }
+      .fact:last-child { border-right: 0; }
+      .fact-label { color: var(--ink-soft); font-size: .76rem; text-transform: uppercase; letter-spacing: .1em; font-weight: 800; }
+      .fact-value { display: block; margin-top: 22px; font-family: "Fraunces", serif; font-size: 2.15rem; line-height: 1.05; }
+      .fact-small { display: block; margin-top: 9px; font-size: .84rem; color: var(--ink-soft); }
+
+      .details-grid { display: grid; grid-template-columns: 1.08fr .92fr; gap: 26px; margin-top: 26px; }
+      .panel { border: 1px solid var(--line); background: var(--paper); padding: 34px; }
+      .panel-dark { background: var(--ink); color: white; border-color: var(--ink); }
+      .panel h3 { font-family: "Fraunces", serif; font-size: 1.75rem; margin-bottom: 23px; }
+      .check-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 15px; }
+      .check-list li { display: grid; grid-template-columns: 24px 1fr; gap: 11px; align-items: start; }
+      .check-list svg { margin-top: 3px; color: var(--sea); }
+      .hotel-card { min-height: 100%; display: flex; flex-direction: column; justify-content: space-between; }
+      .hotel-pill { align-self: start; padding: 7px 11px; background: var(--sun); color: var(--ink); font-size: .72rem; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; }
+      .hotel-name { margin-top: 48px; font-family: "Fraunces", serif; font-size: clamp(2rem, 4vw, 3.5rem); }
+      .hotel-meta { margin: 16px 0 0; color: rgba(255,255,255,.7); }
+
+      .flights { background: #dff4ef; }
+      .flight-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; }
+      .flight-card { background: var(--paper); border: 1px solid rgba(7,31,45,.16); box-shadow: 10px 10px 0 rgba(7,31,45,.08); }
+      .flight-top { display: flex; justify-content: space-between; gap: 20px; padding: 25px 28px; border-bottom: 1px solid var(--line); }
+      .flight-direction { font-size: .76rem; text-transform: uppercase; letter-spacing: .11em; font-weight: 800; color: var(--coral); }
+      .flight-date { font-weight: 800; }
+      .route { display: grid; grid-template-columns: auto 1fr auto; gap: 18px; align-items: center; padding: 34px 28px 26px; }
+      .airport-code { font-family: "Fraunces", serif; font-size: 3rem; line-height: 1; }
+      .city { font-size: .78rem; color: var(--ink-soft); }
+      .route-line { position: relative; height: 1px; background: var(--ink); }
+      .route-line::before { content: "✈"; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-55%); background: var(--paper); padding: 0 10px; color: var(--coral); }
+      .flight-time { display: flex; justify-content: space-between; gap: 18px; padding: 0 28px 28px; color: var(--ink-soft); font-size: .88rem; }
+      .legs { border-top: 1px dashed var(--line); padding: 20px 28px 26px; display: grid; gap: 12px; }
+      .leg { display: grid; grid-template-columns: 66px 1fr auto; gap: 10px; font-size: .83rem; }
+      .leg strong { color: var(--ink); }
+
+      .payments { background: var(--ink); color: white; }
+      .payments .kicker { color: var(--sun); }
+      .payments .section-note { color: rgba(255,255,255,.68); }
+      .payments-layout { display: grid; grid-template-columns: 360px 1fr; gap: 28px; align-items: start; }
+      .payments-layout > * { min-width: 0; }
+      .totals { border: 1px solid rgba(255,255,255,.2); padding: 30px; }
+      .total-main span, .mini-total span { display: block; color: rgba(255,255,255,.58); font-size: .75rem; text-transform: uppercase; letter-spacing: .1em; font-weight: 800; }
+      .total-main strong { display: block; margin-top: 10px; font-family: "Fraunces", serif; font-size: 3.25rem; color: var(--sun); }
+      .mini-totals { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 26px; padding-top: 24px; border-top: 1px solid rgba(255,255,255,.16); }
+      .mini-total strong { display: block; margin-top: 7px; font-size: 1.2rem; }
+      .progress { margin-top: 28px; }
+      .progress-label { display: flex; justify-content: space-between; font-size: .78rem; color: rgba(255,255,255,.68); }
+      .progress-track { height: 10px; margin-top: 9px; background: rgba(255,255,255,.12); overflow: hidden; }
+      .progress-bar { height: 100%; width: 0%; background: linear-gradient(90deg, var(--sea), var(--sun)); transition: width .7s ease; }
+      .sheet-status { display: flex; align-items: center; gap: 8px; margin-top: 24px; font-size: .83rem; color: rgba(255,255,255,.7); }
+      .status-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--sun); }
+      .status-dot.connected { background: #5be29a; box-shadow: 0 0 0 5px rgba(91,226,154,.12); }
+      .sheet-actions { display: grid; gap: 10px; margin-top: 22px; }
+      .sheet-actions .button { width: 100%; }
+      .sheet-actions .button-secondary { border-color: rgba(255,255,255,.24); }
+
+      .table-wrap { border: 1px solid rgba(255,255,255,.2); overflow-x: auto; }
+      table { width: 100%; border-collapse: collapse; min-width: 620px; }
+      th { padding: 17px 20px; text-align: left; color: rgba(255,255,255,.55); text-transform: uppercase; letter-spacing: .09em; font-size: .71rem; border-bottom: 1px solid rgba(255,255,255,.17); }
+      td { padding: 21px 20px; border-bottom: 1px solid rgba(255,255,255,.1); }
+      tbody tr:last-child td { border-bottom: 0; }
+      .traveler { font-weight: 800; }
+      .amount-paid { color: var(--sea-light); font-weight: 800; }
+      .amount-due { color: var(--sun); font-weight: 800; }
+      .state { display: inline-flex; align-items: center; gap: 7px; font-size: .78rem; font-weight: 800; }
+      .state::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--sun); }
+      .state.done::before { background: #5be29a; }
+      .table-note { margin: 16px 0 0; color: rgba(255,255,255,.58); font-size: .82rem; }
+
+      .fine-print { padding: 78px 0; }
+      .notice-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 70px; }
+      .notice-grid h2 { font-size: clamp(2.4rem, 4vw, 4rem); }
+      .notice-list { margin: 4px 0 0; padding: 0; list-style: none; border-top: 1px solid var(--line); }
+      .notice-list li { padding: 17px 0; border-bottom: 1px solid var(--line); }
+      .sunset { position: relative; min-height: 480px; display: grid; place-items: center; overflow: hidden; color: white; text-align: center; }
+      .sunset img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+      .sunset::after { content: ""; position: absolute; inset: 0; background: linear-gradient(rgba(7,31,45,.25), rgba(7,31,45,.76)); }
+      .sunset-copy { position: relative; z-index: 1; padding: 40px; }
+      .sunset-copy p { margin: 0 auto; font-family: "Fraunces", serif; font-size: clamp(2.5rem, 6vw, 5.5rem); line-height: 1; max-width: 900px; }
+      .sunset-copy span { display: block; margin-top: 20px; text-transform: uppercase; letter-spacing: .15em; font-size: .75rem; font-weight: 800; }
+      footer { padding: 28px 0; background: #03151f; color: rgba(255,255,255,.62); font-size: .72rem; }
+      .footer-inner { display: flex; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
+      footer a { color: rgba(255,255,255,.8); }
+
+      dialog { width: min(620px, calc(100% - 28px)); padding: 0; border: 0; background: var(--paper); color: var(--ink); box-shadow: 0 30px 120px rgba(0,0,0,.45); }
+      dialog::backdrop { background: rgba(3,21,31,.72); backdrop-filter: blur(5px); }
+      .dialog-head { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 25px 28px; border-bottom: 1px solid var(--line); }
+      .dialog-head h3 { font-family: "Fraunces", serif; font-size: 1.8rem; }
+      .icon-button { width: 38px; height: 38px; border: 1px solid var(--line); background: transparent; border-radius: 50%; cursor: pointer; }
+      .dialog-body { padding: 28px; }
+      .dialog-body p { margin: 0 0 18px; color: var(--ink-soft); }
+      .steps { padding-left: 20px; color: var(--ink-soft); }
+      .steps li { margin: 8px 0; }
+      label { display: block; margin: 22px 0 7px; font-weight: 800; font-size: .86rem; }
+      .url-input { width: 100%; min-height: 50px; padding: 0 14px; border: 1px solid var(--line); background: white; color: var(--ink); }
+      .url-input:focus { outline: 3px solid rgba(37,189,183,.25); border-color: var(--sea); }
+      .dialog-error { min-height: 23px; margin-top: 9px; color: #a93628; font-size: .82rem; }
+      .dialog-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 10px; }
+      .dialog-actions .button-secondary { color: var(--ink); border-color: var(--line); }
+
+      @keyframes settle { from { opacity: .4; transform: scale(1.1); } to { opacity: .82; transform: scale(1.02); } }
+      @keyframes marquee { to { transform: translateX(-50%); } }
+      @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: .01ms !important; } }
+      @media (max-width: 900px) {
+        .hero-grid, .section-head, .details-grid, .payments-layout, .notice-grid { grid-template-columns: 1fr; }
+        .hero-grid { gap: 45px; }
+        .trip-stamp { justify-self: start; }
+        .facts { grid-template-columns: 1fr 1fr; }
+        .fact:nth-child(2) { border-right: 0; }
+        .fact:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
+        .flight-grid { grid-template-columns: 1fr; }
+        .payments-layout { gap: 18px; }
+      }
+      @media (max-width: 620px) {
+        .shell { width: min(100% - 24px, 1180px); }
+        .nav-inner { height: 72px; }
+        .nav-links a:not(:last-child) { display: none; }
+        .hero { min-height: 720px; }
+        .hero::after { background: linear-gradient(0deg, rgba(4,25,38,.96), rgba(4,25,38,.28) 82%); }
+        .hero-grid { padding: 145px 0 45px; }
+        h1 { font-size: clamp(3.7rem, 21vw, 6rem); }
+        .trip-stamp { width: 100%; transform: none; }
+        .section { padding: 78px 0; }
+        .facts { grid-template-columns: 1fr; }
+        .fact { min-height: auto; border-right: 0; border-bottom: 1px solid var(--line); }
+        .fact:last-child { border-bottom: 0; }
+        .panel { padding: 26px; }
+        .flight-top, .route, .legs { padding-left: 20px; padding-right: 20px; }
+        .airport-code { font-size: 2.4rem; }
+        .leg { grid-template-columns: 58px 1fr; }
+        .leg span:last-child { grid-column: 2; }
+        .payments .section-head { margin-bottom: 34px; }
+        .totals { padding: 24px; }
+        .dialog-actions { flex-direction: column-reverse; }
+        .dialog-actions .button { width: 100%; }
+      }
+    </style>
+  </head>
+  <body>
+    <a class="skip-link" href="#contenido">Saltar al contenido</a>
+    <header class="nav">
+      <div class="shell nav-inner">
+        <a class="brand" href="#inicio" aria-label="Bayahíbe 2027, inicio">
+          <span class="brand-mark" aria-hidden="true">☀</span>
+          <span>Bayahíbe 2027</span>
+        </a>
+        <nav class="nav-links" aria-label="Navegación principal">
+          <a href="#viaje">El viaje</a>
+          <a href="#vuelos">Vuelos</a>
+          <a href="#pagos">Pagos</a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="contenido">
+      <section class="hero" id="inicio">
+        <img class="hero-photo" src="assets/bayahibe-aerial.jpg" alt="Vista aérea de la costa turquesa de Bayahíbe" />
+        <div class="shell hero-grid">
+          <div>
+            <span class="eyebrow">5 — 17 de abril · 2027</span>
+            <h1>Bayahíbe,<br />allá vamos.</h1>
+            <p class="hero-lede">Doce noches de Caribe, amigos y all inclusive. Acá está todo lo que necesitamos saber —incluido cuánto llevamos pagado.</p>
+            <div class="hero-actions">
+              <a class="button button-primary" href="#pagos">Ver pagos</a>
+              <a class="button button-secondary" href="propuesta-bayahibe-abril-2027.pdf" target="_blank" rel="noopener">Abrir propuesta</a>
+            </div>
+          </div>
+          <aside class="trip-stamp" aria-label="Cuenta regresiva del viaje">
+            <div class="stamp-number" id="countdown">—</div>
+            <div class="stamp-label" id="countdownLabel">días para viajar</div>
+            <div class="stamp-dates">Córdoba → Punta Cana<br />LATAM · 1 escala</div>
+          </aside>
+        </div>
+      </section>
+
+      <div class="marquee" aria-hidden="true">
+        <div class="marquee-track">
+          <span>12 noches</span><span>All inclusive</span><span>Viva Dominicus Palace</span><span>Mar Caribe</span><span>12 noches</span><span>All inclusive</span><span>Viva Dominicus Palace</span><span>Mar Caribe</span>
+        </div>
+      </div>
+
+      <section class="section" id="viaje">
+        <div class="shell">
+          <div class="section-head">
+            <span class="kicker">El plan</span>
+            <div>
+              <h2>La propuesta,<br />sin la letra chica.</h2>
+              <p class="section-note">Resumen de la recotización final de Buteler Viajes, emitida el 5 de octubre de 2026.</p>
+            </div>
+          </div>
+
+          <div class="facts">
+            <div class="fact"><span class="fact-label">Salida</span><strong class="fact-value">05 abr.</strong><span class="fact-small">Desde Córdoba</span></div>
+            <div class="fact"><span class="fact-label">Regreso</span><strong class="fact-value">17 abr.</strong><span class="fact-small">Llegada el 18</span></div>
+            <div class="fact"><span class="fact-label">Por persona</span><strong class="fact-value">USD 2.480</strong><span class="fact-small">Base cuádruple</span></div>
+            <div class="fact"><span class="fact-label">Seña</span><strong class="fact-value">USD 700</strong><span class="fact-small">Congela la tarifa</span></div>
+          </div>
+
+          <div class="details-grid">
+            <article class="panel">
+              <h3>Está incluido</h3>
+              <ul class="check-list">
+                <li><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m5 12 4 4L19 6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Vuelos internacionales LATAM con una escala desde Córdoba.</span></li>
+                <li><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m5 12 4 4L19 6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Equipaje de mano de 10 kg y un objeto personal.</span></li>
+                <li><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m5 12 4 4L19 6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg><span>12 noches de hotel con régimen all inclusive.</span></li>
+                <li><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m5 12 4 4L19 6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Traslados regulares de llegada y salida.</span></li>
+              </ul>
+            </article>
+            <article class="panel panel-dark hotel-card">
+              <span class="hotel-pill">Hotel previsto</span>
+              <div>
+                <h3 class="hotel-name">Viva Dominicus Palace by Wyndham</h3>
+                <p class="hotel-meta">1 habitación Superior Plus · All inclusive · Bayahíbe</p>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section flights" id="vuelos">
+        <div class="shell">
+          <div class="section-head">
+            <span class="kicker">Los vuelos</span>
+            <div><h2>Una escala.<br />Después, Caribe.</h2><p class="section-note">Horarios locales según la propuesta. Ambos tramos conectan en Lima.</p></div>
+          </div>
+          <div class="flight-grid">
+            <article class="flight-card">
+              <div class="flight-top"><span class="flight-direction">Ida · 10 h 35 min</span><span class="flight-date">05 ABR 2027</span></div>
+              <div class="route"><div><div class="airport-code">COR</div><div class="city">Córdoba · 07:50</div></div><div class="route-line"></div><div><div class="airport-code">PUJ</div><div class="city">Punta Cana · 17:25</div></div></div>
+              <div class="flight-time"><span>LATAM · Economy</span><span>1 escala</span></div>
+              <div class="legs"><div class="leg"><strong>LA2365</strong><span>Córdoba → Lima</span><span>07:50 — 09:40</span></div><div class="leg"><strong>1 h 35</strong><span>Espera en Lima</span><span>Cambio de avión</span></div><div class="leg"><strong>LA2460</strong><span>Lima → Punta Cana</span><span>11:15 — 17:25</span></div></div>
+            </article>
+            <article class="flight-card">
+              <div class="flight-top"><span class="flight-direction">Vuelta · 11 h 35 min</span><span class="flight-date">17 ABR 2027</span></div>
+              <div class="route"><div><div class="airport-code">PUJ</div><div class="city">Punta Cana · 17:15</div></div><div class="route-line"></div><div><div class="airport-code">COR</div><div class="city">Córdoba · 05:50 +1</div></div></div>
+              <div class="flight-time"><span>LATAM · Economy</span><span>1 escala</span></div>
+              <div class="legs"><div class="leg"><strong>LA2453</strong><span>Punta Cana → Lima</span><span>17:15 — 21:25</span></div><div class="leg"><strong>2 h 45</strong><span>Espera en Lima</span><span>Cambio de avión</span></div><div class="leg"><strong>LA2364</strong><span>Lima → Córdoba</span><span>00:10 — 05:50</span></div></div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section payments" id="pagos">
+        <div class="shell">
+          <div class="section-head">
+            <span class="kicker">La cuenta del grupo</span>
+            <div><h2>Pagos claros.<br />Cero cuentas raras.</h2><p class="section-note">Cada fila nueva de la hoja se suma automáticamente al viajero correspondiente. El total individual tomado es USD 2.480.</p></div>
+          </div>
+          <div class="payments-layout">
+            <aside class="totals">
+              <div class="total-main"><span>Saldo pendiente del grupo</span><strong id="groupDue">USD 9.920</strong></div>
+              <div class="mini-totals"><div class="mini-total"><span>Pagado</span><strong id="groupPaid">USD 0</strong></div><div class="mini-total"><span>Total</span><strong id="groupTotal">USD 9.920</strong></div></div>
+              <div class="progress"><div class="progress-label"><span>Progreso</span><strong id="progressLabel">0%</strong></div><div class="progress-track"><div class="progress-bar" id="progressBar"></div></div></div>
+              <div class="sheet-status"><span class="status-dot" id="statusDot"></span><span id="statusText">Cargando Google Sheets…</span></div>
+              <div class="sheet-actions">
+                <button class="button button-primary" type="button" id="refreshButton">Actualizar pagos</button>
+                <a class="button button-secondary" id="openSheet" href="https://docs.google.com/spreadsheets/d/17YIMlGoyO4UPnLpPLtsj3FEJUrMXPabewKSyh4MQzZI/edit?gid=2141116810#gid=2141116810" target="_blank" rel="noopener">Abrir hoja</a>
+              </div>
+            </aside>
+            <div>
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>Viajero</th><th>Pagado</th><th>Saldo</th><th>Último pago</th><th>Estado</th></tr></thead>
+                  <tbody id="paymentsBody"></tbody>
+                </table>
+              </div>
+              <p class="table-note">La fecha límite para completar el pago es el 6 de marzo de 2027 (30 días antes de la salida). Los pagos en pesos se toman a la cotización informada por la agencia.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="fine-print">
+        <div class="shell notice-grid">
+          <div><span class="kicker">Antes de viajar</span><h2>Lo que no conviene dejar para último momento.</h2></div>
+          <ul class="notice-list">
+            <li><strong>Asistencia al viajero:</strong> no está incluida. La propuesta ofrece Universal Assistance desde USD 8 por persona por día.</li>
+            <li><strong>No incluido:</strong> tasas e impuestos hoteleros, gastos personales y cualquier servicio no mencionado.</li>
+            <li><strong>Documentación:</strong> queda a cargo de cada pasajero.</li>
+            <li><strong>Regalo de la agencia:</strong> carry on, participación en sorteo y programa de pasajeros frecuentes.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="sunset" aria-label="Atardecer en Bayahíbe">
+        <img src="assets/bayahibe-sunset.jpg" alt="Atardecer dorado sobre la playa de Bayahíbe" />
+        <div class="sunset-copy"><p>Nos vemos<br />bajo las palmeras.</p><span>Abril · 2027</span></div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="shell footer-inner">
+        <span>Información basada en la recotización final de Buteler Viajes.</span>
+        <span>Fotos: <a href="https://www.pexels.com/photo/top-view-of-seaside-hotels-and-beach-on-dominicana-17077068/" target="_blank" rel="noopener">Soner Özcan / Pexels</a> · <a href="https://commons.wikimedia.org/wiki/File:Atardecer_bayahibe.jpg" target="_blank" rel="noopener">Cochoncarlos / CC BY-SA 4.0</a></span>
+      </div>
+    </footer>
+
+    <script>
+      const COST_PER_PERSON = 2480;
+      const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/17YIMlGoyO4UPnLpPLtsj3FEJUrMXPabewKSyh4MQzZI/export?format=csv&gid=2141116810";
+      const demoRows = ["Viajero 1", "Viajero 2", "Viajero 3", "Viajero 4"].map(name => ({ name, paid: 0, lastDate: "—" }));
+      const money = new Intl.NumberFormat("es-AR", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
+      const dateFormatter = new Intl.DateTimeFormat("es-AR", { day: "2-digit", month: "short", year: "numeric", timeZone: "UTC" });
+
+      function updateCountdown() {
+        const target = new Date("2027-04-05T00:00:00-03:00");
+        const days = Math.ceil((target - new Date()) / 86400000);
+        const value = document.querySelector("#countdown");
+        const label = document.querySelector("#countdownLabel");
+        if (days > 0) { value.textContent = days; label.textContent = days === 1 ? "día para viajar" : "días para viajar"; }
+        else if (days > -13) { value.textContent = "✦"; label.textContent = "estamos de viaje"; }
+        else { value.textContent = "2027"; label.textContent = "un viaje inolvidable"; }
+      }
+
+      function renderPayments(rows, connected = false) {
+        const total = rows.length * COST_PER_PERSON;
+        const paid = rows.reduce((sum, row) => sum + row.paid, 0);
+        const due = Math.max(total - paid, 0);
+        const percent = total ? Math.min(100, Math.round((paid / total) * 100)) : 0;
+        document.querySelector("#groupTotal").textContent = money.format(total);
+        document.querySelector("#groupPaid").textContent = money.format(paid);
+        document.querySelector("#groupDue").textContent = money.format(due);
+        document.querySelector("#progressLabel").textContent = `${percent}%`;
+        document.querySelector("#progressBar").style.width = `${percent}%`;
+        document.querySelector("#paymentsBody").innerHTML = rows.map(row => {
+          const balance = Math.max(COST_PER_PERSON - row.paid, 0);
+          const complete = balance === 0;
+          const state = complete ? "Completo" : row.paid >= 700 ? "Seña lista" : row.paid > 0 ? "En curso" : "Pendiente";
+          return `<tr><td class="traveler">${escapeHtml(row.name)}</td><td class="amount-paid">${money.format(row.paid)}</td><td class="amount-due">${money.format(balance)}</td><td>${escapeHtml(row.lastDate || "—")}</td><td><span class="state ${complete ? "done" : ""}">${state}</span></td></tr>`;
+        }).join("");
+        document.querySelector("#statusDot").classList.toggle("connected", connected);
+        document.querySelector("#statusText").textContent = connected ? "Sincronizado con Google Sheets" : "Mostrando datos de ejemplo";
+      }
+
+      function escapeHtml(value) {
+        return String(value).replace(/[&<>'"]/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" })[char]);
+      }
+
+      function parseCsv(text) {
+        const rows = [];
+        let row = [], cell = "", quoted = false;
+        for (let i = 0; i < text.length; i++) {
+          const char = text[i], next = text[i + 1];
+          if (char === '"' && quoted && next === '"') { cell += '"'; i++; }
+          else if (char === '"') quoted = !quoted;
+          else if ((char === "," || char === ";") && !quoted) { row.push(cell.trim()); cell = ""; }
+          else if ((char === "\n" || char === "\r") && !quoted) {
+            if (char === "\r" && next === "\n") i++;
+            row.push(cell.trim()); if (row.some(Boolean)) rows.push(row); row = []; cell = "";
+          } else cell += char;
+        }
+        row.push(cell.trim()); if (row.some(Boolean)) rows.push(row);
+        return rows;
+      }
+
+      function normalize(value) { return String(value || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/g, ""); }
+
+      function aggregateSheet(text) {
+        const rows = parseCsv(text);
+        if (rows.length < 2) throw new Error("La hoja está vacía o no tiene filas de pagos.");
+        const headers = rows[0].map(normalize);
+        const nameIndex = headers.findIndex(h => ["nombre", "viajero", "persona"].includes(h));
+        const amountIndex = headers.findIndex(h => ["montousd", "monto", "pagadousd", "pagado", "abonadousd", "abonado"].includes(h));
+        const dateIndex = headers.findIndex(h => ["fecha", "fechapago", "ultimopago"].includes(h));
+        if (nameIndex < 0 || amountIndex < 0) throw new Error("Faltan las columnas Nombre y Monto_USD.");
+        const grouped = new Map();
+        for (const row of rows.slice(1)) {
+          const name = (row[nameIndex] || "").trim();
+          if (!name) continue;
+          const amount = Number(String(row[amountIndex] || "0").replace(/[^0-9,.-]/g, "").replace(",", ".")) || 0;
+          const rawDate = dateIndex >= 0 ? (row[dateIndex] || "").trim() : "";
+          const parsedDate = rawDate ? new Date(`${rawDate}T00:00:00Z`) : null;
+          const current = grouped.get(name) || { name, paid: 0, last: null, lastDate: "—" };
+          current.paid += amount;
+          if (parsedDate && !Number.isNaN(parsedDate.valueOf()) && (!current.last || parsedDate > current.last)) {
+            current.last = parsedDate; current.lastDate = dateFormatter.format(parsedDate);
+          }
+          grouped.set(name, current);
+        }
+        if (!grouped.size) throw new Error("No encontré viajeros en la hoja.");
+        return [...grouped.values()];
+      }
+
+      async function loadSheet() {
+        document.querySelector("#statusText").textContent = "Actualizando desde Google Sheets…";
+        const response = await fetch(SHEET_CSV_URL, { cache: "no-store" });
+        if (!response.ok) throw new Error("No pude leer la hoja. Revisá que esté publicada como CSV.");
+        const rows = aggregateSheet(await response.text());
+        renderPayments(rows, true);
+      }
+
+      document.querySelector("#refreshButton").addEventListener("click", async () => {
+        try { await loadSheet(); }
+        catch (error) { document.querySelector("#statusText").textContent = error.message; }
+      });
+
+      updateCountdown();
+      renderPayments(demoRows);
+      loadSheet().catch(error => { document.querySelector("#statusText").textContent = error.message; });
+    </script>
+  </body>
+</html>
