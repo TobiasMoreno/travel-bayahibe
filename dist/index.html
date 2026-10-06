@@ -23,6 +23,7 @@
         --shadow: 0 24px 70px rgba(7, 31, 45, 0.14);
       }
       * { box-sizing: border-box; }
+      [hidden] { display: none !important; }
       html { scroll-behavior: smooth; }
       body {
         margin: 0;
@@ -180,6 +181,65 @@
       .small-button:hover { border-color: var(--sun); color: var(--sun); }
       .empty-movements { margin: 0; color: rgba(255,255,255,.58); }
 
+      .memories { position: relative; overflow: hidden; background: #f4c97e; }
+      .memories::before { content: ""; position: absolute; inset: 0; opacity: .22; background-image: radial-gradient(circle at 1px 1px, var(--ink) 1px, transparent 0); background-size: 22px 22px; pointer-events: none; }
+      .memories .shell { position: relative; }
+      .memories .kicker { color: var(--ink); }
+      .memories-head { display: grid; grid-template-columns: .75fr 1.25fr; gap: 40px; align-items: end; margin-bottom: 42px; }
+      .memories-title-row { display: flex; align-items: end; justify-content: space-between; gap: 28px; }
+      .memories-title-row h2 { max-width: 690px; }
+      .memory-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 18px; margin-bottom: 26px; padding: 14px 16px; border: 1px solid var(--ink); background: rgba(255,253,247,.78); backdrop-filter: blur(8px); }
+      .memory-filters { display: flex; flex-wrap: wrap; gap: 8px; }
+      .filter-button { min-height: 38px; padding: 0 14px; border: 1px solid var(--line); border-radius: 999px; background: transparent; color: var(--ink); font-weight: 800; font-size: .76rem; cursor: pointer; }
+      .filter-button:hover, .filter-button.active { background: var(--ink); border-color: var(--ink); color: white; }
+      .memory-count { white-space: nowrap; font-size: .78rem; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; }
+      .memory-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; align-items: start; }
+      .memory-card { position: relative; min-width: 0; background: var(--paper); border: 1px solid var(--ink); box-shadow: 7px 8px 0 rgba(7,31,45,.14); transition: transform .24s ease, box-shadow .24s ease; }
+      .memory-card:nth-child(3n+1) { transform: rotate(-.35deg); }
+      .memory-card:nth-child(3n+2) { transform: rotate(.3deg); }
+      .memory-card:hover { transform: rotate(0) translateY(-5px); box-shadow: 10px 13px 0 rgba(7,31,45,.17); }
+      .memory-media { position: relative; display: block; width: 100%; padding: 0; border: 0; background: #0b3243; cursor: zoom-in; overflow: hidden; }
+      .memory-media img { width: 100%; height: auto; min-height: 190px; max-height: 520px; object-fit: cover; transition: transform .55s cubic-bezier(.2,.75,.25,1); }
+      .memory-card:hover .memory-media img { transform: scale(1.025); }
+      .memory-type { position: absolute; left: 13px; top: 13px; padding: 6px 9px; background: var(--ink); color: white; font-size: .65rem; font-weight: 800; letter-spacing: .09em; text-transform: uppercase; }
+      .memory-play { position: absolute; inset: 50% auto auto 50%; width: 58px; height: 58px; transform: translate(-50%,-50%); display: grid; place-items: center; border-radius: 50%; background: var(--sun); color: var(--ink); font-size: 1.2rem; box-shadow: 0 12px 35px rgba(0,0,0,.28); }
+      .memory-info { padding: 18px 18px 16px; }
+      .memory-caption { margin: 0 0 14px; font-family: "Fraunces", serif; font-size: 1.28rem; line-height: 1.18; }
+      .memory-meta { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-top: 13px; border-top: 1px solid var(--line); color: var(--ink-soft); font-size: .72rem; font-weight: 700; }
+      .memory-author { color: var(--coral); text-transform: uppercase; letter-spacing: .08em; font-weight: 800; }
+      .memory-delete { position: absolute; right: 11px; top: 11px; z-index: 2; width: 36px; height: 36px; display: grid; place-items: center; border: 1px solid rgba(255,255,255,.55); border-radius: 50%; background: rgba(7,31,45,.78); color: white; cursor: pointer; opacity: 0; transition: opacity .2s, background .2s; }
+      .memory-card:hover .memory-delete, .memory-delete:focus-visible { opacity: 1; }
+      .memory-delete:hover { background: var(--coral); }
+      .memory-state { display: grid; place-items: center; min-height: 330px; padding: 50px 20px; border: 1px dashed rgba(7,31,45,.45); text-align: center; background: rgba(255,253,247,.45); }
+      .memory-state-mark { width: 74px; height: 74px; display: grid; place-items: center; margin-bottom: 20px; border: 1px solid var(--ink); border-radius: 50%; font-family: "Fraunces", serif; font-size: 2rem; }
+      .memory-state h3 { font-family: "Fraunces", serif; font-size: 2rem; }
+      .memory-state p { max-width: 480px; margin: 10px auto 0; color: var(--ink-soft); }
+      .memory-state .button { margin-top: 23px; }
+
+      .upload-dialog { width: min(720px, calc(100% - 28px)); }
+      .drop-zone { display: grid; place-items: center; min-height: 155px; margin-top: 20px; padding: 24px; border: 1px dashed var(--ink); background: #f8efd9; text-align: center; cursor: pointer; }
+      .drop-zone:hover, .drop-zone.dragging { background: var(--sea-light); border-style: solid; }
+      .drop-zone strong { display: block; font-family: "Fraunces", serif; font-size: 1.42rem; }
+      .drop-zone span { display: block; margin-top: 5px; color: var(--ink-soft); font-size: .8rem; }
+      .drop-zone input { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+      .selected-files { display: grid; gap: 7px; margin-top: 12px; }
+      .selected-file { display: flex; justify-content: space-between; gap: 14px; padding: 8px 11px; background: rgba(37,189,183,.12); font-size: .76rem; }
+      .upload-progress { height: 8px; margin-top: 12px; background: rgba(7,31,45,.1); overflow: hidden; }
+      .upload-progress-bar { width: 0; height: 100%; background: linear-gradient(90deg, var(--sea), var(--coral)); transition: width .2s; }
+
+      .pin-dialog { width: min(430px, calc(100% - 28px)); }
+      .pin-input { text-align: center; font-size: 1.35rem; letter-spacing: .18em; }
+      .lightbox-dialog { width: min(1120px, calc(100% - 20px)); max-height: calc(100vh - 20px); background: var(--ink); color: white; }
+      .lightbox-dialog .dialog-head { border-color: rgba(255,255,255,.16); }
+      .lightbox-dialog .icon-button { color: white; border-color: rgba(255,255,255,.25); }
+      .lightbox-stage { display: grid; place-items: center; min-height: 300px; max-height: calc(100vh - 190px); background: #03151f; }
+      .lightbox-stage img, .lightbox-stage video { max-width: 100%; max-height: calc(100vh - 190px); }
+      .lightbox-copy { display: flex; justify-content: space-between; gap: 20px; padding: 17px 24px 22px; color: rgba(255,255,255,.7); font-size: .82rem; }
+      .lightbox-copy strong { color: var(--sun); }
+      .toast { position: fixed; right: 22px; bottom: 22px; z-index: 100; max-width: min(390px, calc(100% - 44px)); padding: 14px 18px; background: var(--ink); color: white; box-shadow: var(--shadow); transform: translateY(20px); opacity: 0; pointer-events: none; transition: .25s ease; }
+      .toast.visible { transform: translateY(0); opacity: 1; }
+      .button:disabled { cursor: wait; opacity: .58; transform: none; }
+
       .fine-print { padding: 78px 0; }
       .notice-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 70px; }
       .notice-grid h2 { font-size: clamp(2.4rem, 4vw, 4rem); }
@@ -221,7 +281,7 @@
       @keyframes marquee { to { transform: translateX(-50%); } }
       @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: .01ms !important; } }
       @media (max-width: 900px) {
-        .hero-grid, .section-head, .details-grid, .payments-layout, .notice-grid { grid-template-columns: 1fr; }
+        .hero-grid, .section-head, .details-grid, .payments-layout, .notice-grid, .memories-head { grid-template-columns: 1fr; }
         .hero-grid { gap: 45px; }
         .trip-stamp { justify-self: start; }
         .facts { grid-template-columns: 1fr 1fr; }
@@ -229,6 +289,7 @@
         .fact:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
         .flight-grid { grid-template-columns: 1fr; }
         .payments-layout { gap: 18px; }
+        .memory-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       }
       @media (max-width: 620px) {
         .shell { width: min(100% - 24px, 1180px); }
@@ -253,6 +314,10 @@
         .movements-head { align-items: stretch; flex-direction: column; }
         .movement { grid-template-columns: 1fr 1fr; }
         .movement-note, .movement-actions { grid-column: 1 / -1; }
+        .memories-title-row, .memory-toolbar, .lightbox-copy { align-items: stretch; flex-direction: column; }
+        .memory-count { white-space: normal; }
+        .memory-delete { opacity: 1; }
+        .memory-grid { grid-template-columns: 1fr; }
         .form-grid { grid-template-columns: 1fr; }
         .form-grid .full { grid-column: auto; }
         .dialog-actions { flex-direction: column-reverse; }
@@ -272,6 +337,7 @@
           <a href="#viaje">El viaje</a>
           <a href="#vuelos">Vuelos</a>
           <a href="#pagos">Pagos</a>
+          <a href="#recuerdos">Recuerdos</a>
         </nav>
       </div>
     </header>
@@ -401,6 +467,43 @@
         </div>
       </section>
 
+      <section class="section memories" id="recuerdos">
+        <div class="shell">
+          <div class="memories-head">
+            <span class="kicker">La memoria del viaje</span>
+            <div>
+              <div class="memories-title-row">
+                <h2>Un pedacito<br />del Caribe, guardado.</h2>
+                <button class="button button-primary" type="button" id="openUploadButton">+ Agregar recuerdos</button>
+              </div>
+              <p class="section-note">Fotos, videos y esos momentos que después cuentan toda la historia. La biblioteca es de Andy, Cata, Tobi y Vale.</p>
+            </div>
+          </div>
+
+          <div class="memory-toolbar" id="memoryToolbar" hidden>
+            <div class="memory-filters" role="group" aria-label="Filtrar recuerdos">
+              <button class="filter-button active" type="button" data-filter="all">Todos</button>
+              <button class="filter-button" type="button" data-filter="image">Fotos</button>
+              <button class="filter-button" type="button" data-filter="video">Videos</button>
+              <button class="filter-button" type="button" data-filter="Andy">Andy</button>
+              <button class="filter-button" type="button" data-filter="Cata">Cata</button>
+              <button class="filter-button" type="button" data-filter="Tobi">Tobi</button>
+              <button class="filter-button" type="button" data-filter="Vale">Vale</button>
+            </div>
+            <span class="memory-count" id="memoryCount"></span>
+          </div>
+
+          <div class="memory-state" id="memoryState" aria-live="polite">
+            <div>
+              <span class="memory-state-mark" aria-hidden="true">◌</span>
+              <h3>Cargando la biblioteca…</h3>
+              <p>Buscando fotos y videos en Cloudinary.</p>
+            </div>
+          </div>
+          <div class="memory-grid" id="memoryGrid" hidden></div>
+        </div>
+      </section>
+
       <section class="fine-print">
         <div class="shell notice-grid">
           <div><span class="kicker">Antes de viajar</span><h2>Lo que no conviene dejar para último momento.</h2></div>
@@ -441,15 +544,55 @@
       </form>
     </dialog>
 
+    <dialog class="upload-dialog" id="uploadDialog" aria-labelledby="uploadDialogTitle">
+      <div class="dialog-head"><h3 id="uploadDialogTitle">Agregar recuerdos</h3><button class="icon-button" type="button" id="closeUploadDialog" aria-label="Cerrar">×</button></div>
+      <form class="dialog-body" id="uploadForm">
+        <div class="form-grid">
+          <div><label for="memoryAuthor">¿Quién los agrega?</label><select class="form-control" id="memoryAuthor" required><option>Andy</option><option>Cata</option><option>Tobi</option><option>Vale</option></select></div>
+          <div><label for="memoryDate">Fecha del recuerdo</label><input class="form-control" id="memoryDate" type="date" /></div>
+          <div class="full"><label for="memoryCaption">Una frase para recordarlo</label><textarea class="form-control" id="memoryCaption" maxlength="280" placeholder="Ej.: primer atardecer en la playa"></textarea></div>
+        </div>
+        <label class="drop-zone" id="dropZone" for="memoryFiles">
+          <input id="memoryFiles" type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif,video/mp4,video/quicktime,video/webm" multiple required />
+          <span><strong>Elegí fotos o videos</strong><span>También podés arrastrarlos acá · hasta 15 MB por foto y 80 MB por video</span></span>
+        </label>
+        <div class="selected-files" id="selectedFiles"></div>
+        <div class="upload-progress" id="uploadProgress" hidden><div class="upload-progress-bar" id="uploadProgressBar"></div></div>
+        <div class="dialog-error" id="uploadError" role="alert"></div>
+        <div class="dialog-actions"><button class="button button-secondary" type="button" id="cancelUploadDialog">Cancelar</button><button class="button button-primary" type="submit" id="uploadButton">Subir recuerdos</button></div>
+      </form>
+    </dialog>
+
+    <dialog class="pin-dialog" id="pinDialog" aria-labelledby="pinDialogTitle">
+      <div class="dialog-head"><h3 id="pinDialogTitle">Acceso del grupo</h3><button class="icon-button" type="button" id="closePinDialog" aria-label="Cerrar">×</button></div>
+      <form class="dialog-body" id="pinForm">
+        <p>Ingresá el mismo PIN que usan para editar los pagos. Se recordará solo mientras esta pestaña esté abierta.</p>
+        <label for="accessPin">PIN</label>
+        <input class="form-control pin-input" id="accessPin" type="password" inputmode="numeric" autocomplete="off" required />
+        <div class="dialog-error" id="pinError" role="alert"></div>
+        <div class="dialog-actions"><button class="button button-secondary" type="button" id="cancelPinDialog">Cancelar</button><button class="button button-primary" type="submit">Continuar</button></div>
+      </form>
+    </dialog>
+
+    <dialog class="lightbox-dialog" id="lightboxDialog" aria-labelledby="lightboxTitle">
+      <div class="dialog-head"><h3 id="lightboxTitle">Recuerdo</h3><button class="icon-button" type="button" id="closeLightbox" aria-label="Cerrar">×</button></div>
+      <div class="lightbox-stage" id="lightboxStage"></div>
+      <div class="lightbox-copy"><span id="lightboxCaption"></span><strong id="lightboxMeta"></strong></div>
+    </dialog>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
     <script>
       const COST_PER_PERSON = 2480;
       const TRAVELERS = ["Andy", "Cata", "Tobi", "Vale"];
-      const PAYMENTS_PIN = "790106";
       const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/17YIMlGoyO4UPnLpPLtsj3FEJUrMXPabewKSyh4MQzZI/export?format=csv&gid=2141116810";
       const demoRecords = TRAVELERS.map((name, index) => ({ id: `roster-${index}`, name, amount: 0, date: "", note: "" }));
       const money = new Intl.NumberFormat("es-AR", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
       const dateFormatter = new Intl.DateTimeFormat("es-AR", { day: "2-digit", month: "short", year: "numeric", timeZone: "UTC" });
       let currentRecords = [];
+      let memoryAssets = [];
+      let memoryFilter = "all";
+      let pinResolver = null;
 
       function updateCountdown() {
         const target = new Date("2027-04-05T00:00:00-03:00");
@@ -519,6 +662,39 @@
         return String(value).replace(/[&<>'"]/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" })[char]);
       }
 
+      const pinDialog = document.querySelector("#pinDialog");
+      const pinForm = document.querySelector("#pinForm");
+
+      function requestAccessPin() {
+        const cached = sessionStorage.getItem("travelAccessPin");
+        if (cached) return Promise.resolve(cached);
+        document.querySelector("#accessPin").value = "";
+        document.querySelector("#pinError").textContent = "";
+        pinDialog.showModal();
+        setTimeout(() => document.querySelector("#accessPin").focus(), 0);
+        return new Promise(resolve => { pinResolver = resolve; });
+      }
+
+      function finishPin(value) {
+        if (value) sessionStorage.setItem("travelAccessPin", value);
+        if (pinDialog.open) pinDialog.close();
+        if (pinResolver) pinResolver(value || null);
+        pinResolver = null;
+      }
+
+      function clearRejectedPin(response) {
+        if (response.status === 401) sessionStorage.removeItem("travelAccessPin");
+      }
+
+      pinForm.addEventListener("submit", event => {
+        event.preventDefault();
+        const value = document.querySelector("#accessPin").value.trim();
+        if (!value) { document.querySelector("#pinError").textContent = "Ingresá el PIN."; return; }
+        finishPin(value);
+      });
+      ["#closePinDialog", "#cancelPinDialog"].forEach(selector => document.querySelector(selector).addEventListener("click", () => finishPin(null)));
+      pinDialog.addEventListener("cancel", event => { event.preventDefault(); finishPin(null); });
+
       function parseCsv(text) {
         const rows = [];
         let row = [], cell = "", quoted = false;
@@ -577,11 +753,14 @@
       }
 
       async function mutatePayment(action, payment) {
+        const pin = await requestAccessPin();
+        if (!pin) throw new Error("Ingresá el PIN para editar los pagos.");
         const response = await fetch("/api/payments", {
           method: "POST",
           headers: { "content-type": "application/json" },
-          body: JSON.stringify({ action, payment, pin: PAYMENTS_PIN }),
+          body: JSON.stringify({ action, payment, pin }),
         });
+        clearRejectedPin(response);
         const data = await response.json().catch(() => ({ ok: false, error: "La respuesta del servidor no es válida." }));
         if (!response.ok || !data.ok) throw new Error(data.error || "No se pudo guardar el pago.");
         applyRecords(data.payments, true);
@@ -606,6 +785,204 @@
         if (!window.confirm(`¿Eliminar el pago de ${record.name} por ${money.format(record.amount)}?`)) return;
         try { await mutatePayment("delete", { id: record.id }); }
         catch (error) { window.alert(error.message); }
+      }
+
+      const uploadDialog = document.querySelector("#uploadDialog");
+      const uploadForm = document.querySelector("#uploadForm");
+      const lightboxDialog = document.querySelector("#lightboxDialog");
+      const galleryDateFormatter = new Intl.DateTimeFormat("es-AR", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
+      let selectedMemoryFiles = [];
+      let toastTimer = null;
+
+      function showToast(message) {
+        const toast = document.querySelector("#toast");
+        toast.textContent = message;
+        toast.classList.add("visible");
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => toast.classList.remove("visible"), 3200);
+      }
+
+      function transformedUrl(url, transformation, format = "") {
+        if (!url || !url.includes("/upload/")) return url;
+        const transformed = url.replace("/upload/", `/upload/${transformation}/`);
+        return format ? transformed.replace(/\.[a-z0-9]+(?:\?.*)?$/i, `.${format}`) : transformed;
+      }
+
+      function memoryDate(asset) {
+        const value = asset.capturedAt || String(asset.createdAt || "").slice(0, 10);
+        if (!value) return "Sin fecha";
+        const date = new Date(`${value.slice(0, 10)}T00:00:00Z`);
+        return Number.isNaN(date.valueOf()) ? "Sin fecha" : galleryDateFormatter.format(date);
+      }
+
+      function renderMemories() {
+        const grid = document.querySelector("#memoryGrid");
+        const state = document.querySelector("#memoryState");
+        const toolbar = document.querySelector("#memoryToolbar");
+        const filtered = memoryAssets.filter(asset => memoryFilter === "all" || asset.resourceType === memoryFilter || asset.author === memoryFilter);
+        toolbar.hidden = memoryAssets.length === 0;
+        document.querySelector("#memoryCount").textContent = `${filtered.length} ${filtered.length === 1 ? "recuerdo" : "recuerdos"}`;
+
+        if (!memoryAssets.length) {
+          grid.hidden = true;
+          state.hidden = false;
+          state.innerHTML = '<div><span class="memory-state-mark" aria-hidden="true">✦</span><h3>La primera página está en blanco.</h3><p>Suban la primera foto o video y empiecen a escribir la historia del viaje.</p><button class="button button-primary" type="button" data-open-upload>Agregar el primer recuerdo</button></div>';
+          return;
+        }
+        state.hidden = true;
+        grid.hidden = false;
+        if (!filtered.length) {
+          grid.innerHTML = '<div class="memory-state"><div><span class="memory-state-mark" aria-hidden="true">○</span><h3>No hay recuerdos con este filtro.</h3><p>Probá con otra categoría o agregá uno nuevo.</p></div></div>';
+          return;
+        }
+
+        grid.innerHTML = filtered.map(asset => {
+          const index = memoryAssets.indexOf(asset);
+          const isVideo = asset.resourceType === "video";
+          const preview = isVideo
+            ? transformedUrl(asset.url, "so_0,f_jpg,q_auto:good,c_limit,w_900", "jpg")
+            : transformedUrl(asset.url, "f_auto,q_auto:good,c_limit,w_1000");
+          const caption = asset.caption || (isVideo ? "Un video para volver a ese momento" : "Un recuerdo de Bayahíbe");
+          return `<article class="memory-card" data-type="${escapeHtml(asset.resourceType)}" data-author="${escapeHtml(asset.author)}">
+            <button class="memory-delete" type="button" data-delete-memory="${index}" aria-label="Eliminar recuerdo">×</button>
+            <button class="memory-media" type="button" data-open-memory="${index}" aria-label="Abrir ${escapeHtml(caption)}">
+              <img src="${escapeHtml(preview)}" alt="${escapeHtml(caption)}" loading="lazy" />
+              <span class="memory-type">${isVideo ? "Video" : "Foto"}</span>
+              ${isVideo ? '<span class="memory-play" aria-hidden="true">▶</span>' : ""}
+            </button>
+            <div class="memory-info">
+              <p class="memory-caption">${escapeHtml(caption)}</p>
+              <div class="memory-meta"><span class="memory-author">Por ${escapeHtml(asset.author)}</span><span>${escapeHtml(memoryDate(asset))}</span></div>
+            </div>
+          </article>`;
+        }).join("");
+      }
+
+      function showGalleryError(message) {
+        document.querySelector("#memoryGrid").hidden = true;
+        document.querySelector("#memoryToolbar").hidden = true;
+        const state = document.querySelector("#memoryState");
+        state.hidden = false;
+        state.innerHTML = `<div><span class="memory-state-mark" aria-hidden="true">!</span><h3>No pudimos abrir la biblioteca.</h3><p>${escapeHtml(message)}</p><button class="button button-primary" type="button" data-retry-gallery>Intentar de nuevo</button></div>`;
+      }
+
+      async function loadGallery() {
+        try {
+          const response = await fetch("/api/gallery", { cache: "no-store" });
+          const data = await response.json().catch(() => ({ ok: false, error: "La respuesta del servidor no es válida." }));
+          if (!response.ok || !data.ok) throw new Error(data.error || "No se pudo cargar la biblioteca.");
+          memoryAssets = Array.isArray(data.assets) ? data.assets : [];
+          renderMemories();
+        } catch (error) { showGalleryError(error.message); }
+      }
+
+      function openUploadDialog() {
+        uploadForm.reset();
+        selectedMemoryFiles = [];
+        document.querySelector("#selectedFiles").innerHTML = "";
+        document.querySelector("#uploadError").textContent = "";
+        document.querySelector("#uploadProgress").hidden = true;
+        document.querySelector("#uploadProgressBar").style.width = "0%";
+        document.querySelector("#memoryDate").value = new Date().toISOString().slice(0, 10);
+        uploadDialog.showModal();
+      }
+
+      function renderSelectedFiles() {
+        document.querySelector("#selectedFiles").innerHTML = selectedMemoryFiles.map(file => {
+          const size = file.size >= 1048576 ? `${(file.size / 1048576).toFixed(1)} MB` : `${Math.ceil(file.size / 1024)} KB`;
+          return `<div class="selected-file"><span>${escapeHtml(file.name)}</span><strong>${size}</strong></div>`;
+        }).join("");
+      }
+
+      function validateFiles(files) {
+        const accepted = [];
+        for (const file of files) {
+          const isImage = file.type.startsWith("image/");
+          const isVideo = file.type.startsWith("video/");
+          if (!isImage && !isVideo) throw new Error(`${file.name}: el formato no es compatible.`);
+          const limit = isVideo ? 80 * 1024 * 1024 : 15 * 1024 * 1024;
+          if (file.size > limit) throw new Error(`${file.name}: supera el límite de ${isVideo ? "80" : "15"} MB.`);
+          accepted.push(file);
+        }
+        if (!accepted.length) throw new Error("Elegí al menos una foto o un video.");
+        return accepted.slice(0, 20);
+      }
+
+      async function requestUploadSignature(pin) {
+        const response = await fetch("/api/gallery", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({
+            action: "sign",
+            pin,
+            author: document.querySelector("#memoryAuthor").value,
+            caption: document.querySelector("#memoryCaption").value.trim(),
+            capturedAt: document.querySelector("#memoryDate").value,
+          }),
+        });
+        clearRejectedPin(response);
+        const data = await response.json().catch(() => ({ ok: false, error: "La respuesta del servidor no es válida." }));
+        if (!response.ok || !data.ok) throw new Error(data.error || "No se pudo autorizar la subida.");
+        return data;
+      }
+
+      function uploadMemoryFile(file, signatureData, onProgress) {
+        return new Promise((resolve, reject) => {
+          const request = new XMLHttpRequest();
+          request.open("POST", `https://api.cloudinary.com/v1_1/${encodeURIComponent(signatureData.cloudName)}/auto/upload`);
+          request.upload.addEventListener("progress", event => {
+            if (event.lengthComputable) onProgress(event.loaded / event.total);
+          });
+          request.addEventListener("load", () => {
+            const data = (() => { try { return JSON.parse(request.responseText); } catch (_) { return {}; } })();
+            if (request.status >= 200 && request.status < 300) resolve(data);
+            else reject(new Error(data.error?.message || `No se pudo subir ${file.name}.`));
+          });
+          request.addEventListener("error", () => reject(new Error(`Se cortó la conexión mientras se subía ${file.name}.`)));
+          const form = new FormData();
+          form.append("file", file);
+          form.append("api_key", signatureData.apiKey);
+          form.append("signature", signatureData.signature);
+          Object.entries(signatureData.uploadParams).forEach(([key, value]) => form.append(key, String(value)));
+          request.send(form);
+        });
+      }
+
+      function openMemory(asset) {
+        const stage = document.querySelector("#lightboxStage");
+        if (asset.resourceType === "video") {
+          stage.innerHTML = `<video src="${escapeHtml(asset.url)}" controls autoplay playsinline></video>`;
+        } else {
+          stage.innerHTML = `<img src="${escapeHtml(transformedUrl(asset.url, "f_auto,q_auto:good,c_limit,w_1800"))}" alt="${escapeHtml(asset.caption || "Recuerdo de Bayahíbe")}" />`;
+        }
+        document.querySelector("#lightboxTitle").textContent = asset.caption || "Recuerdo de Bayahíbe";
+        document.querySelector("#lightboxCaption").textContent = asset.caption || "";
+        document.querySelector("#lightboxMeta").textContent = `${asset.author} · ${memoryDate(asset)}`;
+        lightboxDialog.showModal();
+      }
+
+      function closeLightbox() {
+        const video = document.querySelector("#lightboxStage video");
+        if (video) video.pause();
+        lightboxDialog.close();
+        document.querySelector("#lightboxStage").innerHTML = "";
+      }
+
+      async function deleteMemory(asset) {
+        if (!window.confirm("¿Eliminar este recuerdo de la biblioteca? Esta acción no se puede deshacer.")) return;
+        const pin = await requestAccessPin();
+        if (!pin) return;
+        const response = await fetch("/api/gallery", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ action: "delete", pin, assetId: asset.assetId }),
+        });
+        clearRejectedPin(response);
+        const data = await response.json().catch(() => ({ ok: false, error: "La respuesta del servidor no es válida." }));
+        if (!response.ok || !data.ok) throw new Error(data.error || "No se pudo eliminar el recuerdo.");
+        memoryAssets = memoryAssets.filter(item => item.assetId !== asset.assetId);
+        renderMemories();
+        showToast("Recuerdo eliminado.");
       }
 
       document.querySelector("#refreshButton").addEventListener("click", async () => {
@@ -640,9 +1017,81 @@
         finally { saveButton.disabled = false; }
       });
 
+      document.querySelector("#openUploadButton").addEventListener("click", openUploadDialog);
+      ["#closeUploadDialog", "#cancelUploadDialog"].forEach(selector => document.querySelector(selector).addEventListener("click", () => uploadDialog.close()));
+      document.querySelector("#memoryState").addEventListener("click", event => {
+        if (event.target.closest("[data-open-upload]")) openUploadDialog();
+        if (event.target.closest("[data-retry-gallery]")) loadGallery();
+      });
+      document.querySelector("#memoryToolbar").addEventListener("click", event => {
+        const button = event.target.closest("[data-filter]");
+        if (!button) return;
+        memoryFilter = button.dataset.filter;
+        document.querySelectorAll("[data-filter]").forEach(item => item.classList.toggle("active", item === button));
+        renderMemories();
+      });
+      document.querySelector("#memoryGrid").addEventListener("click", async event => {
+        const openButton = event.target.closest("[data-open-memory]");
+        const deleteButton = event.target.closest("[data-delete-memory]");
+        if (openButton) openMemory(memoryAssets[Number(openButton.dataset.openMemory)]);
+        if (deleteButton) {
+          const asset = memoryAssets[Number(deleteButton.dataset.deleteMemory)];
+          try { await deleteMemory(asset); }
+          catch (error) { showToast(error.message); }
+        }
+      });
+      document.querySelector("#memoryFiles").addEventListener("change", event => {
+        try {
+          selectedMemoryFiles = validateFiles([...event.target.files]);
+          document.querySelector("#uploadError").textContent = event.target.files.length > 20 ? "Se subirán los primeros 20 archivos." : "";
+          renderSelectedFiles();
+        } catch (error) { selectedMemoryFiles = []; renderSelectedFiles(); document.querySelector("#uploadError").textContent = error.message; }
+      });
+
+      const dropZone = document.querySelector("#dropZone");
+      ["dragenter", "dragover"].forEach(type => dropZone.addEventListener(type, event => { event.preventDefault(); dropZone.classList.add("dragging"); }));
+      ["dragleave", "drop"].forEach(type => dropZone.addEventListener(type, event => { event.preventDefault(); dropZone.classList.remove("dragging"); }));
+      dropZone.addEventListener("drop", event => {
+        try { selectedMemoryFiles = validateFiles([...event.dataTransfer.files]); document.querySelector("#uploadError").textContent = ""; renderSelectedFiles(); }
+        catch (error) { selectedMemoryFiles = []; renderSelectedFiles(); document.querySelector("#uploadError").textContent = error.message; }
+      });
+
+      uploadForm.addEventListener("submit", async event => {
+        event.preventDefault();
+        const errorBox = document.querySelector("#uploadError");
+        const uploadButton = document.querySelector("#uploadButton");
+        try {
+          selectedMemoryFiles = validateFiles(selectedMemoryFiles.length ? selectedMemoryFiles : [...document.querySelector("#memoryFiles").files]);
+          const pin = await requestAccessPin();
+          if (!pin) return;
+          uploadButton.disabled = true;
+          errorBox.textContent = "Preparando la subida…";
+          const signature = await requestUploadSignature(pin);
+          const progress = document.querySelector("#uploadProgress");
+          const progressBar = document.querySelector("#uploadProgressBar");
+          progress.hidden = false;
+          for (let index = 0; index < selectedMemoryFiles.length; index++) {
+            const file = selectedMemoryFiles[index];
+            errorBox.textContent = `Subiendo ${index + 1} de ${selectedMemoryFiles.length}: ${file.name}`;
+            await uploadMemoryFile(file, signature, fileProgress => {
+              progressBar.style.width = `${Math.round(((index + fileProgress) / selectedMemoryFiles.length) * 100)}%`;
+            });
+          }
+          progressBar.style.width = "100%";
+          uploadDialog.close();
+          showToast(selectedMemoryFiles.length === 1 ? "Recuerdo guardado." : `${selectedMemoryFiles.length} recuerdos guardados.`);
+          await loadGallery();
+        } catch (error) { errorBox.textContent = error.message; }
+        finally { uploadButton.disabled = false; }
+      });
+
+      document.querySelector("#closeLightbox").addEventListener("click", closeLightbox);
+      lightboxDialog.addEventListener("cancel", event => { event.preventDefault(); closeLightbox(); });
+
       updateCountdown();
       applyRecords(demoRecords, false);
       loadSheet().catch(error => { document.querySelector("#statusText").textContent = error.message; });
+      loadGallery();
     </script>
   </body>
 </html>
