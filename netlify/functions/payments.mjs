@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 
 const RECEIPTS_FOLDER = "travel-bayahibe/comprobantes";
 const RECEIPTS_TAG = "travel-bayahibe-comprobante";
+const PAYMENTS_PIN = "790106";
 
 const json = (body, status = 200) => new Response(JSON.stringify(body), {
   status,
@@ -125,7 +126,7 @@ export default async (request) => {
     if (request.method !== "POST") return json({ ok: false, error: "Método no permitido." }, 405);
 
     const body = await request.json();
-    if (!process.env.PAYMENTS_PIN || String(body.pin || "") !== process.env.PAYMENTS_PIN) {
+    if (String(body.pin || "") !== PAYMENTS_PIN) {
       return json({ ok: false, error: "PIN incorrecto." }, 401);
     }
 

@@ -244,8 +244,6 @@
       .upload-progress { height: 8px; margin-top: 12px; background: rgba(7,31,45,.1); overflow: hidden; }
       .upload-progress-bar { width: 0; height: 100%; background: linear-gradient(90deg, var(--sea), var(--coral)); transition: width .2s; }
 
-      .pin-dialog { width: min(430px, calc(100% - 28px)); }
-      .pin-input { text-align: center; font-size: 1.35rem; letter-spacing: .18em; }
       .lightbox-dialog { width: min(1120px, calc(100% - 20px)); max-height: calc(100vh - 20px); background: var(--ink); color: white; }
       .lightbox-dialog .dialog-head { border-color: rgba(255,255,255,.16); }
       .lightbox-dialog .icon-button { color: white; border-color: rgba(255,255,255,.25); }
@@ -596,17 +594,6 @@
       </form>
     </dialog>
 
-    <dialog class="pin-dialog" id="pinDialog" aria-labelledby="pinDialogTitle">
-      <div class="dialog-head"><h3 id="pinDialogTitle">Acceso del grupo</h3><button class="icon-button" type="button" id="closePinDialog" aria-label="Cerrar">×</button></div>
-      <form class="dialog-body" id="pinForm">
-        <p>Ingresá el mismo PIN que usan para editar los pagos. Se recordará solo mientras esta pestaña esté abierta.</p>
-        <label for="accessPin">PIN</label>
-        <input class="form-control pin-input" id="accessPin" type="password" inputmode="numeric" autocomplete="off" required />
-        <div class="dialog-error" id="pinError" role="alert"></div>
-        <div class="dialog-actions"><button class="button button-secondary" type="button" id="cancelPinDialog">Cancelar</button><button class="button button-primary" type="submit">Continuar</button></div>
-      </form>
-    </dialog>
-
     <dialog class="lightbox-dialog" id="lightboxDialog" aria-labelledby="lightboxTitle">
       <div class="dialog-head"><h3 id="lightboxTitle">Recuerdo</h3><button class="icon-button" type="button" id="closeLightbox" aria-label="Cerrar">×</button></div>
       <div class="lightbox-stage" id="lightboxStage"></div>
@@ -618,6 +605,7 @@
     <script>
       const COST_PER_PERSON = 2480;
       const TRAVELERS = ["Andy", "Cata", "Tobi", "Vale"];
+      const PAYMENTS_PIN = "790106";
       const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/17YIMlGoyO4UPnLpPLtsj3FEJUrMXPabewKSyh4MQzZI/export?format=csv&gid=2141116810";
       const demoRecords = TRAVELERS.map((name, index) => ({ id: `roster-${index}`, name, amount: 0, date: "", note: "" }));
       const money = new Intl.NumberFormat("es-AR", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
@@ -625,7 +613,6 @@
       let currentRecords = [];
       let memoryAssets = [];
       let memoryFilter = "all";
-      let pinResolver = null;
       let currentPaymentReceipt = null;
       let selectedPaymentReceiptFile = null;
       let removeCurrentReceipt = false;
@@ -699,39 +686,6 @@
         return String(value).replace(/[&<>'"]/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" })[char]);
       }
 
-      const pinDialog = document.querySelector("#pinDialog");
-      const pinForm = document.querySelector("#pinForm");
-
-      function requestAccessPin() {
-        const cached = sessionStorage.getItem("travelAccessPin");
-        if (cached) return Promise.resolve(cached);
-        document.querySelector("#accessPin").value = "";
-        document.querySelector("#pinError").textContent = "";
-        pinDialog.showModal();
-        setTimeout(() => document.querySelector("#accessPin").focus(), 0);
-        return new Promise(resolve => { pinResolver = resolve; });
-      }
-
-      function finishPin(value) {
-        if (value) sessionStorage.setItem("travelAccessPin", value);
-        if (pinDialog.open) pinDialog.close();
-        if (pinResolver) pinResolver(value || null);
-        pinResolver = null;
-      }
-
-      function clearRejectedPin(response) {
-        if (response.status === 401) sessionStorage.removeItem("travelAccessPin");
-      }
-
-      pinForm.addEventListener("submit", event => {
-        event.preventDefault();
-        const value = document.querySelector("#accessPin").value.trim();
-        if (!value) { document.querySelector("#pinError").textContent = "Ingresá el PIN."; return; }
-        finishPin(value);
-      });
-      ["#closePinDialog", "#cancelPinDialog"].forEach(selector => document.querySelector(selector).addEventListener("click", () => finishPin(null)));
-      pinDialog.addEventListener("cancel", event => { event.preventDefault(); finishPin(null); });
-
       function parseCsv(text) {
         const rows = [];
         let row = [], cell = "", quoted = false;
@@ -802,14 +756,12 @@
       }
 
       async function mutatePayment(action, payment, providedPin = "") {
-        const pin = providedPin || await requestAccessPin();
-        if (!pin) throw new Error("Ingresá el PIN para editar los pagos.");
+        const pin = providedPin || PAYMENTS_PIN;
         const response = await fetch("/api/payments", {
           method: "POST",
           headers: { "content-type": "application/json" },
           body: JSON.stringify({ action, payment, pin }),
         });
-        clearRejectedPin(response);
         const data = await response.json().catch(() => ({ ok: false, error: "La respuesta del servidor no es válida." }));
         if (!response.ok || !data.ok) throw new Error(data.error || "No se pudo guardar el pago.");
         applyRecords(data.payments, true);
@@ -853,7 +805,6 @@
           headers: { "content-type": "application/json" },
           body: JSON.stringify({ action: "signReceipt", pin, traveler }),
         });
-        clearRejectedPin(response);
         const data = await response.json().catch(() => ({ ok: false, error: "La respuesta del servidor no es válida." }));
         if (!response.ok || !data.ok) throw new Error(data.error || "No se pudo autorizar el comprobante.");
         return data;
@@ -1160,11 +1111,9 @@
         const errorBox = document.querySelector("#paymentError");
         const saveButton = document.querySelector("#savePaymentButton");
         let uploadedReceipt = null;
-        let pin = "";
+        const pin = PAYMENTS_PIN;
         errorBox.textContent = "Guardando…"; saveButton.disabled = true;
         try {
-          pin = await requestAccessPin();
-          if (!pin) return;
           if (selectedPaymentReceiptFile) {
             errorBox.textContent = "Subiendo comprobante…";
             uploadedReceipt = await uploadPaymentReceipt(selectedPaymentReceiptFile, pin, payment.name, progress => {
