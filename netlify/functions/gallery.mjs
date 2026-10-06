@@ -13,9 +13,9 @@ const json = (body, status = 200) => new Response(JSON.stringify(body), {
 });
 
 function getConfig() {
-  const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
-  const apiKey = process.env.CLOUDINARY_API_KEY;
-  const apiSecret = process.env.CLOUDINARY_API_SECRET;
+  const cloudName = String(process.env.CLOUDINARY_CLOUD_NAME || "").trim();
+  const apiKey = String(process.env.CLOUDINARY_API_KEY || "").trim();
+  const apiSecret = String(process.env.CLOUDINARY_API_SECRET || "").trim();
   if (!cloudName || !apiKey || !apiSecret) {
     throw new Error("Cloudinary todavía no está configurado en Netlify.");
   }
@@ -25,7 +25,7 @@ function getConfig() {
 function sign(params, secret) {
   const payload = Object.entries(params)
     .filter(([, value]) => value !== undefined && value !== null && value !== "")
-    .sort(([left], [right]) => left.localeCompare(right))
+    .sort(([left], [right]) => left < right ? -1 : left > right ? 1 : 0)
     .map(([key, value]) => `${key}=${Array.isArray(value) ? value.join(",") : value}`)
     .join("&");
   return createHash("sha1").update(`${payload}${secret}`).digest("hex");

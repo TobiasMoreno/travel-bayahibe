@@ -176,10 +176,19 @@
       .movement { display: grid; grid-template-columns: 1.1fr .7fr .8fr 1.4fr auto; gap: 14px; align-items: center; padding: 15px 17px; border: 1px solid rgba(255,255,255,.15); }
       .movement strong { color: var(--sea-light); }
       .movement-meta { color: rgba(255,255,255,.62); font-size: .82rem; }
-      .movement-actions { display: flex; gap: 7px; }
-      .small-button { min-height: 35px; padding: 0 11px; border: 1px solid rgba(255,255,255,.24); background: transparent; color: white; font-weight: 700; font-size: .75rem; cursor: pointer; }
+      .movement-actions { display: flex; flex-wrap: wrap; gap: 7px; }
+      .small-button { min-height: 35px; padding: 0 11px; display: inline-flex; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,.24); background: transparent; color: white; text-decoration: none; font-weight: 700; font-size: .75rem; cursor: pointer; }
       .small-button:hover { border-color: var(--sun); color: var(--sun); }
       .empty-movements { margin: 0; color: rgba(255,255,255,.58); }
+      .receipt-control { padding: 14px; border: 1px solid var(--line); background: #f8efd9; }
+      .receipt-picker { min-height: 48px; margin: 0; padding: 0 15px; display: flex; align-items: center; justify-content: center; gap: 9px; border: 1px dashed var(--ink); background: var(--paper); cursor: pointer; font-size: .8rem; transition: background .2s, border-color .2s; }
+      .receipt-picker:hover { background: var(--sea-light); border-style: solid; }
+      .receipt-picker input { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+      .receipt-current { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px; padding: 11px 12px; background: var(--ink); color: white; }
+      .receipt-current a { min-width: 0; color: var(--sea-light); font-size: .78rem; font-weight: 800; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .receipt-remove { flex: 0 0 auto; border: 0; background: transparent; color: var(--sun); font-weight: 800; font-size: .74rem; cursor: pointer; }
+      .receipt-selection { min-height: 20px; margin-top: 8px; color: var(--ink-soft); font-size: .74rem; }
+      .receipt-badge { border-color: rgba(188,236,230,.35); color: var(--sea-light); }
 
       .memories { position: relative; overflow: hidden; background: #f4c97e; }
       .memories::before { content: ""; position: absolute; inset: 0; opacity: .22; background-image: radial-gradient(circle at 1px 1px, var(--ink) 1px, transparent 0); background-size: 22px 22px; pointer-events: none; }
@@ -193,6 +202,14 @@
       .filter-button { min-height: 38px; padding: 0 14px; border: 1px solid var(--line); border-radius: 999px; background: transparent; color: var(--ink); font-weight: 800; font-size: .76rem; cursor: pointer; }
       .filter-button:hover, .filter-button.active { background: var(--ink); border-color: var(--ink); color: white; }
       .memory-count { white-space: nowrap; font-size: .78rem; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; }
+      .storage-usage { display: grid; grid-template-columns: auto minmax(180px, 1fr) auto; align-items: center; gap: 18px; margin-bottom: 26px; padding: 15px 17px; border: 1px solid var(--ink); background: var(--ink); color: white; }
+      .storage-usage-label { font-size: .72rem; font-weight: 800; text-transform: uppercase; letter-spacing: .09em; }
+      .storage-track { height: 9px; overflow: hidden; background: rgba(255,255,255,.15); }
+      .storage-bar { width: 0; height: 100%; background: linear-gradient(90deg, var(--sea), var(--sun)); transition: width .7s ease; }
+      .storage-values { display: flex; gap: 15px; white-space: nowrap; font-size: .76rem; }
+      .storage-values strong { color: var(--sun); }
+      .storage-usage.error .storage-track, .storage-usage.error .storage-values { display: none; }
+      .storage-usage.error { grid-template-columns: 1fr; color: rgba(255,255,255,.68); }
       .memory-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; align-items: start; }
       .memory-card { position: relative; min-width: 0; background: var(--paper); border: 1px solid var(--ink); box-shadow: 7px 8px 0 rgba(7,31,45,.14); transition: transform .24s ease, box-shadow .24s ease; }
       .memory-card:nth-child(3n+1) { transform: rotate(-.35deg); }
@@ -315,6 +332,8 @@
         .movement { grid-template-columns: 1fr 1fr; }
         .movement-note, .movement-actions { grid-column: 1 / -1; }
         .memories-title-row, .memory-toolbar, .lightbox-copy { align-items: stretch; flex-direction: column; }
+        .storage-usage { grid-template-columns: 1fr; gap: 10px; }
+        .storage-values { justify-content: space-between; }
         .memory-count { white-space: normal; }
         .memory-delete { opacity: 1; }
         .memory-grid { grid-template-columns: 1fr; }
@@ -493,6 +512,12 @@
             <span class="memory-count" id="memoryCount"></span>
           </div>
 
+          <div class="storage-usage" id="storageUsage" aria-live="polite">
+            <span class="storage-usage-label" id="storageUsageLabel">Almacenamiento · consultando…</span>
+            <div class="storage-track" aria-hidden="true"><div class="storage-bar" id="storageBar"></div></div>
+            <div class="storage-values"><span><strong id="storageOccupied">—</strong> ocupado</span><span><strong id="storageFree">—</strong> libre</span></div>
+          </div>
+
           <div class="memory-state" id="memoryState" aria-live="polite">
             <div>
               <span class="memory-state-mark" aria-hidden="true">◌</span>
@@ -537,6 +562,14 @@
           <div><label for="paymentAmount">Monto en USD</label><input class="form-control" id="paymentAmount" type="number" min="1" step="1" inputmode="decimal" required /></div>
           <div><label for="paymentDate">Fecha</label><input class="form-control" id="paymentDate" type="date" required /></div>
           <div class="full"><label for="paymentNote">Nota</label><textarea class="form-control" id="paymentNote" placeholder="Ej.: segunda entrega"></textarea></div>
+          <div class="full">
+            <label for="paymentReceipt">Comprobante</label>
+            <div class="receipt-control">
+              <div class="receipt-current" id="currentReceipt" hidden><a id="currentReceiptLink" href="#" target="_blank" rel="noopener">Ver comprobante actual</a><button class="receipt-remove" type="button" id="removeReceiptButton">Quitar</button></div>
+              <label class="receipt-picker" for="paymentReceipt"><span aria-hidden="true">↥</span><span id="receiptPickerLabel">Adjuntar foto o PDF</span><input id="paymentReceipt" type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif,application/pdf" /></label>
+              <div class="receipt-selection" id="receiptSelection">Opcional · máximo 10 MB</div>
+            </div>
+          </div>
         </div>
         <input id="paymentId" type="hidden" />
         <div class="dialog-error" id="paymentError" role="alert"></div>
@@ -554,7 +587,7 @@
         </div>
         <label class="drop-zone" id="dropZone" for="memoryFiles">
           <input id="memoryFiles" type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif,video/mp4,video/quicktime,video/webm" multiple required />
-          <span><strong>Elegí fotos o videos</strong><span>También podés arrastrarlos acá · hasta 15 MB por foto y 80 MB por video</span></span>
+          <span><strong>Elegí fotos o videos</strong><span>También podés arrastrarlos acá · hasta 10 MB por foto y 80 MB por video</span></span>
         </label>
         <div class="selected-files" id="selectedFiles"></div>
         <div class="upload-progress" id="uploadProgress" hidden><div class="upload-progress-bar" id="uploadProgressBar"></div></div>
@@ -593,6 +626,9 @@
       let memoryAssets = [];
       let memoryFilter = "all";
       let pinResolver = null;
+      let currentPaymentReceipt = null;
+      let selectedPaymentReceiptFile = null;
+      let removeCurrentReceipt = false;
 
       function updateCountdown() {
         const target = new Date("2027-04-05T00:00:00-03:00");
@@ -648,7 +684,8 @@
         }
         list.innerHTML = payments.map(record => {
           const date = record.date ? dateFormatter.format(new Date(`${record.date}T00:00:00Z`)) : "Sin fecha";
-          return `<article class="movement"><span class="traveler">${escapeHtml(record.name)}</span><strong>${money.format(record.amount)}</strong><span class="movement-meta">${escapeHtml(date)}</span><span class="movement-meta movement-note">${escapeHtml(record.note || "Sin nota")}</span><span class="movement-actions"><button class="small-button" type="button" data-action="edit" data-id="${escapeHtml(record.id)}">Editar</button><button class="small-button" type="button" data-action="delete" data-id="${escapeHtml(record.id)}">Eliminar</button></span></article>`;
+          const receipt = record.receipt?.url ? `<a class="small-button receipt-badge" href="${escapeHtml(record.receipt.url)}" target="_blank" rel="noopener" title="${escapeHtml(record.receipt.name || "Comprobante")}">Comprobante</a>` : "";
+          return `<article class="movement"><span class="traveler">${escapeHtml(record.name)}</span><strong>${money.format(record.amount)}</strong><span class="movement-meta">${escapeHtml(date)}</span><span class="movement-meta movement-note">${escapeHtml(record.note || "Sin nota")}</span><span class="movement-actions">${receipt}<button class="small-button" type="button" data-action="edit" data-id="${escapeHtml(record.id)}">Editar</button><button class="small-button" type="button" data-action="delete" data-id="${escapeHtml(record.id)}">Eliminar</button></span></article>`;
         }).join("");
       }
 
@@ -723,6 +760,11 @@
         const amountIndex = headers.findIndex(h => ["montousd", "monto", "pagadousd", "pagado", "abonadousd", "abonado"].includes(h));
         const dateIndex = headers.findIndex(h => ["fecha", "fechapago", "ultimopago"].includes(h));
         const noteIndex = headers.findIndex(h => ["nota", "detalle", "comentario"].includes(h));
+        const receiptAssetIndex = headers.findIndex(h => h === "comprobanteassetid");
+        const receiptPublicIndex = headers.findIndex(h => h === "comprobantepublicid");
+        const receiptTypeIndex = headers.findIndex(h => h === "comprobantetipo");
+        const receiptUrlIndex = headers.findIndex(h => h === "comprobanteurl");
+        const receiptNameIndex = headers.findIndex(h => h === "comprobantenombre");
         if (nameIndex < 0 || amountIndex < 0) throw new Error("Faltan las columnas Nombre y Monto_USD.");
         const records = [];
         for (const [index, row] of rows.slice(1).entries()) {
@@ -732,7 +774,14 @@
           const rawDate = dateIndex >= 0 ? (row[dateIndex] || "").trim() : "";
           const localizedDate = rawDate.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
           const date = localizedDate ? `${localizedDate[3]}-${localizedDate[2].padStart(2, "0")}-${localizedDate[1].padStart(2, "0")}` : rawDate;
-          records.push({ id: idIndex >= 0 ? row[idIndex] : `csv-${index}`, name, amount, date, note: noteIndex >= 0 ? row[noteIndex] : "" });
+          const receipt = receiptAssetIndex >= 0 && row[receiptAssetIndex] ? {
+            assetId: row[receiptAssetIndex],
+            publicId: receiptPublicIndex >= 0 ? row[receiptPublicIndex] : "",
+            resourceType: receiptTypeIndex >= 0 ? row[receiptTypeIndex] : "image",
+            url: receiptUrlIndex >= 0 ? row[receiptUrlIndex] : "",
+            name: receiptNameIndex >= 0 ? row[receiptNameIndex] : "Comprobante",
+          } : null;
+          records.push({ id: idIndex >= 0 ? row[idIndex] : `csv-${index}`, name, amount, date, note: noteIndex >= 0 ? row[noteIndex] : "", receipt });
         }
         if (!records.length) throw new Error("No encontré viajeros en la hoja.");
         return records;
@@ -752,8 +801,8 @@
         applyRecords(recordsFromSheet(await csvResponse.text()), true);
       }
 
-      async function mutatePayment(action, payment) {
-        const pin = await requestAccessPin();
+      async function mutatePayment(action, payment, providedPin = "") {
+        const pin = providedPin || await requestAccessPin();
         if (!pin) throw new Error("Ingresá el PIN para editar los pagos.");
         const response = await fetch("/api/payments", {
           method: "POST",
@@ -764,10 +813,72 @@
         const data = await response.json().catch(() => ({ ok: false, error: "La respuesta del servidor no es válida." }));
         if (!response.ok || !data.ok) throw new Error(data.error || "No se pudo guardar el pago.");
         applyRecords(data.payments, true);
+        if (data.cleanupWarning) showToast(data.cleanupWarning);
       }
 
       const paymentDialog = document.querySelector("#paymentDialog");
       const paymentForm = document.querySelector("#paymentForm");
+
+      function updateReceiptControl() {
+        const current = document.querySelector("#currentReceipt");
+        const link = document.querySelector("#currentReceiptLink");
+        const label = document.querySelector("#receiptPickerLabel");
+        const selection = document.querySelector("#receiptSelection");
+        const showCurrent = Boolean(currentPaymentReceipt && !removeCurrentReceipt && !selectedPaymentReceiptFile);
+        current.hidden = !showCurrent;
+        if (showCurrent) {
+          link.href = currentPaymentReceipt.url;
+          link.textContent = currentPaymentReceipt.name || "Ver comprobante actual";
+        }
+        if (selectedPaymentReceiptFile) {
+          label.textContent = "Cambiar archivo elegido";
+          selection.textContent = `${selectedPaymentReceiptFile.name} · ${(selectedPaymentReceiptFile.size / 1048576).toFixed(1)} MB`;
+        } else {
+          label.textContent = showCurrent ? "Reemplazar comprobante" : "Adjuntar foto o PDF";
+          selection.textContent = removeCurrentReceipt ? "El comprobante actual se eliminará al guardar." : "Opcional · máximo 10 MB";
+        }
+      }
+
+      function validateReceiptFile(file) {
+        if (!file) return null;
+        const allowed = ["image/jpeg", "image/png", "image/webp", "image/heic", "image/heif", "application/pdf"];
+        if (!allowed.includes(file.type)) throw new Error("El comprobante debe ser una imagen JPG, PNG, WEBP, HEIC o un PDF.");
+        if (file.size > 10 * 1024 * 1024) throw new Error("El comprobante no puede superar los 10 MB.");
+        return file;
+      }
+
+      async function requestReceiptSignature(pin, traveler) {
+        const response = await fetch("/api/payments", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ action: "signReceipt", pin, traveler }),
+        });
+        clearRejectedPin(response);
+        const data = await response.json().catch(() => ({ ok: false, error: "La respuesta del servidor no es válida." }));
+        if (!response.ok || !data.ok) throw new Error(data.error || "No se pudo autorizar el comprobante.");
+        return data;
+      }
+
+      async function uploadPaymentReceipt(file, pin, traveler, onProgress) {
+        const signature = await requestReceiptSignature(pin, traveler);
+        const uploaded = await uploadCloudinaryFile(file, signature, onProgress);
+        return {
+          assetId: uploaded.asset_id,
+          publicId: uploaded.public_id,
+          resourceType: uploaded.resource_type,
+          url: uploaded.secure_url,
+          name: file.name,
+        };
+      }
+
+      async function discardPaymentReceipt(receipt, pin) {
+        if (!receipt?.assetId) return;
+        await fetch("/api/payments", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ action: "discardReceipt", pin, assetId: receipt.assetId }),
+        });
+      }
 
       function openPaymentDialog(record = null) {
         document.querySelector("#paymentDialogTitle").textContent = record ? "Editar pago" : "Agregar pago";
@@ -777,6 +888,11 @@
         document.querySelector("#paymentAmount").value = record ? record.amount : "";
         document.querySelector("#paymentDate").value = record ? record.date : new Date().toISOString().slice(0, 10);
         document.querySelector("#paymentNote").value = record ? record.note : "";
+        document.querySelector("#paymentReceipt").value = "";
+        currentPaymentReceipt = record?.receipt || null;
+        selectedPaymentReceiptFile = null;
+        removeCurrentReceipt = false;
+        updateReceiptControl();
         document.querySelector("#paymentError").textContent = "";
         paymentDialog.showModal();
       }
@@ -876,6 +992,24 @@
         } catch (error) { showGalleryError(error.message); }
       }
 
+      async function loadCloudinaryUsage() {
+        const container = document.querySelector("#storageUsage");
+        try {
+          const response = await fetch("/api/cloudinary-usage", { cache: "no-store" });
+          const data = await response.json().catch(() => ({ ok: false }));
+          if (!response.ok || !data.ok) throw new Error(data.error || "Consumo no disponible");
+          const formatPercent = value => `${new Intl.NumberFormat("es-AR", { maximumFractionDigits: 1 }).format(Number(value) || 0)}%`;
+          container.classList.remove("error");
+          document.querySelector("#storageUsageLabel").textContent = "Almacenamiento Cloudinary";
+          document.querySelector("#storageOccupied").textContent = formatPercent(data.occupiedPercent);
+          document.querySelector("#storageFree").textContent = formatPercent(data.freePercent);
+          document.querySelector("#storageBar").style.width = `${Math.min(100, Math.max(0, Number(data.occupiedPercent) || 0))}%`;
+        } catch (_) {
+          container.classList.add("error");
+          document.querySelector("#storageUsageLabel").textContent = "Almacenamiento Cloudinary · consumo no disponible";
+        }
+      }
+
       function openUploadDialog() {
         uploadForm.reset();
         selectedMemoryFiles = [];
@@ -900,8 +1034,8 @@
           const isImage = file.type.startsWith("image/");
           const isVideo = file.type.startsWith("video/");
           if (!isImage && !isVideo) throw new Error(`${file.name}: el formato no es compatible.`);
-          const limit = isVideo ? 80 * 1024 * 1024 : 15 * 1024 * 1024;
-          if (file.size > limit) throw new Error(`${file.name}: supera el límite de ${isVideo ? "80" : "15"} MB.`);
+          const limit = isVideo ? 80 * 1024 * 1024 : 10 * 1024 * 1024;
+          if (file.size > limit) throw new Error(`${file.name}: supera el límite de ${isVideo ? "80" : "10"} MB.`);
           accepted.push(file);
         }
         if (!accepted.length) throw new Error("Elegí al menos una foto o un video.");
@@ -924,7 +1058,7 @@
         return data;
       }
 
-      function uploadMemoryFile(file, signatureData, onProgress) {
+      function uploadCloudinaryFile(file, signatureData, onProgress) {
         return new Promise((resolve, reject) => {
           const request = new XMLHttpRequest();
           request.open("POST", `https://api.cloudinary.com/v1_1/${encodeURIComponent(signatureData.cloudName)}/auto/upload`);
@@ -994,6 +1128,25 @@
         if (button.dataset.action === "edit") openPaymentDialog(record);
         if (button.dataset.action === "delete") deletePayment(record);
       });
+      document.querySelector("#paymentReceipt").addEventListener("change", event => {
+        const errorBox = document.querySelector("#paymentError");
+        try {
+          selectedPaymentReceiptFile = validateReceiptFile(event.target.files[0]);
+          removeCurrentReceipt = false;
+          errorBox.textContent = "";
+        } catch (error) {
+          selectedPaymentReceiptFile = null;
+          event.target.value = "";
+          errorBox.textContent = error.message;
+        }
+        updateReceiptControl();
+      });
+      document.querySelector("#removeReceiptButton").addEventListener("click", () => {
+        selectedPaymentReceiptFile = null;
+        document.querySelector("#paymentReceipt").value = "";
+        removeCurrentReceipt = Boolean(currentPaymentReceipt);
+        updateReceiptControl();
+      });
       paymentForm.addEventListener("submit", async event => {
         event.preventDefault();
         const id = document.querySelector("#paymentId").value;
@@ -1006,9 +1159,26 @@
         };
         const errorBox = document.querySelector("#paymentError");
         const saveButton = document.querySelector("#savePaymentButton");
+        let uploadedReceipt = null;
+        let pin = "";
         errorBox.textContent = "Guardando…"; saveButton.disabled = true;
-        try { await mutatePayment(id ? "update" : "create", payment); paymentDialog.close(); }
-        catch (error) { errorBox.textContent = error.message; }
+        try {
+          pin = await requestAccessPin();
+          if (!pin) return;
+          if (selectedPaymentReceiptFile) {
+            errorBox.textContent = "Subiendo comprobante…";
+            uploadedReceipt = await uploadPaymentReceipt(selectedPaymentReceiptFile, pin, payment.name, progress => {
+              errorBox.textContent = `Subiendo comprobante… ${Math.round(progress * 100)}%`;
+            });
+          }
+          payment.receipt = uploadedReceipt || (removeCurrentReceipt ? null : currentPaymentReceipt);
+          errorBox.textContent = "Guardando pago…";
+          await mutatePayment(id ? "update" : "create", payment, pin);
+          paymentDialog.close();
+        } catch (error) {
+          if (uploadedReceipt && pin) discardPaymentReceipt(uploadedReceipt, pin).catch(() => {});
+          errorBox.textContent = error.message;
+        }
         finally { saveButton.disabled = false; }
       });
 
@@ -1066,7 +1236,7 @@
           for (let index = 0; index < selectedMemoryFiles.length; index++) {
             const file = selectedMemoryFiles[index];
             errorBox.textContent = `Subiendo ${index + 1} de ${selectedMemoryFiles.length}: ${file.name}`;
-            await uploadMemoryFile(file, signature, fileProgress => {
+            await uploadCloudinaryFile(file, signature, fileProgress => {
               progressBar.style.width = `${Math.round(((index + fileProgress) / selectedMemoryFiles.length) * 100)}%`;
             });
           }
@@ -1085,6 +1255,7 @@
       applyRecords(demoRecords, false);
       loadSheet().catch(error => { document.querySelector("#statusText").textContent = error.message; });
       loadGallery();
+      loadCloudinaryUsage();
     </script>
   </body>
 </html>

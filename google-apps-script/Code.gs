@@ -1,6 +1,7 @@
 const SPREADSHEET_ID = "17YIMlGoyO4UPnLpPLtsj3FEJUrMXPabewKSyh4MQzZI";
 const SHEET_NAME = "Pagos";
 const ALLOWED_TRAVELERS = ["Andy", "Cata", "Tobi", "Vale"];
+const RECEIPT_HEADERS = ["Comprobante_Asset_ID", "Comprobante_Public_ID", "Comprobante_Tipo", "Comprobante_URL", "Comprobante_Nombre"];
 
 function doGet(e) {
   if (!isAuthorized_(e && e.parameter && e.parameter.secret)) return json_({ ok: false, error: "No autorizado." });
@@ -30,6 +31,9 @@ function doPost(e) {
 function getSheet_() {
   const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName(SHEET_NAME);
   if (!sheet) throw new Error("No existe la pestaña Pagos.");
+  const headerRange = sheet.getRange(1, 6, 1, RECEIPT_HEADERS.length);
+  const currentHeaders = headerRange.getValues()[0];
+  if (currentHeaders.join("") !== RECEIPT_HEADERS.join("")) headerRange.setValues([RECEIPT_HEADERS]);
   return sheet;
 }
 
@@ -42,7 +46,14 @@ function listPayments_() {
       name: String(row[1] || ""),
       amount: Number(row[2] || 0),
       date: row[3] instanceof Date ? Utilities.formatDate(row[3], "UTC", "yyyy-MM-dd") : String(row[3] || ""),
-      note: String(row[4] || "")
+      note: String(row[4] || ""),
+      receipt: row[5] ? {
+        assetId: String(row[5] || ""),
+        publicId: String(row[6] || ""),
+        resourceType: String(row[7] || "image"),
+        url: String(row[8] || ""),
+        name: String(row[9] || "Comprobante")
+      } : null
     };
   });
 }
@@ -50,13 +61,28 @@ function listPayments_() {
 function createPayment_(payment) {
   validatePayment_(payment);
   const id = "p_" + new Date().getTime() + "_" + Math.random().toString(36).slice(2, 8);
-  getSheet_().appendRow([id, payment.name, Number(payment.amount), payment.date || "", payment.note || ""]);
+  const receipt = receiptValues_(payment.receipt);
+  getSheet_().appendRow([id, payment.name, Number(payment.amount), payment.date || "", payment.note || ""].concat(receipt));
 }
 
 function updatePayment_(payment) {
   validatePayment_(payment);
   const row = findRow_(payment.id);
-  getSheet_().getRange(row, 1, 1, 5).setValues([[payment.id, payment.name, Number(payment.amount), payment.date || "", payment.note || ""]]);
+  const sheet = getSheet_();
+  const existingReceipt = sheet.getRange(row, 6, 1, RECEIPT_HEADERS.length).getValues()[0];
+  const receipt = Object.prototype.hasOwnProperty.call(payment, "receipt") ? receiptValues_(payment.receipt) : existingReceipt;
+  sheet.getRange(row, 1, 1, 10).setValues([[payment.id, payment.name, Number(payment.amount), payment.date || "", payment.note || ""].concat(receipt)]);
+}
+
+function receiptValues_(receipt) {
+  if (!receipt || !receipt.assetId || !receipt.url) return ["", "", "", "", ""];
+  return [
+    String(receipt.assetId),
+    String(receipt.publicId || ""),
+    String(receipt.resourceType || "image"),
+    String(receipt.url),
+    String(receipt.name || "Comprobante")
+  ];
 }
 
 function deletePayment_(id) {
