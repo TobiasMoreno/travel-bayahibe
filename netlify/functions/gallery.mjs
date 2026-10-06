@@ -22,12 +22,6 @@ function getConfig() {
   return { cloudName, apiKey, apiSecret };
 }
 
-function requirePin(pin) {
-  const expected = process.env.GALLERY_PIN || process.env.PAYMENTS_PIN;
-  if (!expected) throw new Error("El PIN de edición todavía no está configurado.");
-  return Boolean(pin && String(pin) === String(expected));
-}
-
 function sign(params, secret) {
   const payload = Object.entries(params)
     .filter(([, value]) => value !== undefined && value !== null && value !== "")
@@ -165,7 +159,6 @@ export default async (request) => {
     if (request.method !== "POST") return json({ ok: false, error: "Método no permitido." }, 405);
 
     const body = await request.json();
-    if (!requirePin(body.pin)) return json({ ok: false, error: "PIN incorrecto." }, 401);
     if (body.action === "sign") return json({ ok: true, ...prepareUpload(body, config) });
     if (body.action === "delete") {
       await deleteAsset(body, config);

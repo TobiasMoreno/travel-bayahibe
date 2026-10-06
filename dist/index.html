@@ -908,19 +908,17 @@
         return accepted.slice(0, 20);
       }
 
-      async function requestUploadSignature(pin) {
+      async function requestUploadSignature() {
         const response = await fetch("/api/gallery", {
           method: "POST",
           headers: { "content-type": "application/json" },
           body: JSON.stringify({
             action: "sign",
-            pin,
             author: document.querySelector("#memoryAuthor").value,
             caption: document.querySelector("#memoryCaption").value.trim(),
             capturedAt: document.querySelector("#memoryDate").value,
           }),
         });
-        clearRejectedPin(response);
         const data = await response.json().catch(() => ({ ok: false, error: "La respuesta del servidor no es válida." }));
         if (!response.ok || !data.ok) throw new Error(data.error || "No se pudo autorizar la subida.");
         return data;
@@ -970,14 +968,11 @@
 
       async function deleteMemory(asset) {
         if (!window.confirm("¿Eliminar este recuerdo de la biblioteca? Esta acción no se puede deshacer.")) return;
-        const pin = await requestAccessPin();
-        if (!pin) return;
         const response = await fetch("/api/gallery", {
           method: "POST",
           headers: { "content-type": "application/json" },
-          body: JSON.stringify({ action: "delete", pin, assetId: asset.assetId }),
+          body: JSON.stringify({ action: "delete", assetId: asset.assetId }),
         });
-        clearRejectedPin(response);
         const data = await response.json().catch(() => ({ ok: false, error: "La respuesta del servidor no es válida." }));
         if (!response.ok || !data.ok) throw new Error(data.error || "No se pudo eliminar el recuerdo.");
         memoryAssets = memoryAssets.filter(item => item.assetId !== asset.assetId);
@@ -1062,11 +1057,9 @@
         const uploadButton = document.querySelector("#uploadButton");
         try {
           selectedMemoryFiles = validateFiles(selectedMemoryFiles.length ? selectedMemoryFiles : [...document.querySelector("#memoryFiles").files]);
-          const pin = await requestAccessPin();
-          if (!pin) return;
           uploadButton.disabled = true;
           errorBox.textContent = "Preparando la subida…";
-          const signature = await requestUploadSignature(pin);
+          const signature = await requestUploadSignature();
           const progress = document.querySelector("#uploadProgress");
           const progressBar = document.querySelector("#uploadProgressBar");
           progress.hidden = false;
