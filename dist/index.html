@@ -169,6 +169,17 @@
       .state::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--sun); }
       .state.done::before { background: #5be29a; }
       .table-note { margin: 16px 0 0; color: rgba(255,255,255,.58); font-size: .82rem; }
+      .movements { margin-top: 34px; border-top: 1px solid rgba(255,255,255,.2); padding-top: 28px; }
+      .movements-head { display: flex; justify-content: space-between; align-items: center; gap: 18px; margin-bottom: 18px; }
+      .movements-head h3 { font-family: "Fraunces", serif; font-size: 1.8rem; }
+      .movements-list { display: grid; gap: 10px; }
+      .movement { display: grid; grid-template-columns: 1.1fr .7fr .8fr 1.4fr auto; gap: 14px; align-items: center; padding: 15px 17px; border: 1px solid rgba(255,255,255,.15); }
+      .movement strong { color: var(--sea-light); }
+      .movement-meta { color: rgba(255,255,255,.62); font-size: .82rem; }
+      .movement-actions { display: flex; gap: 7px; }
+      .small-button { min-height: 35px; padding: 0 11px; border: 1px solid rgba(255,255,255,.24); background: transparent; color: white; font-weight: 700; font-size: .75rem; cursor: pointer; }
+      .small-button:hover { border-color: var(--sun); color: var(--sun); }
+      .empty-movements { margin: 0; color: rgba(255,255,255,.58); }
 
       .fine-print { padding: 78px 0; }
       .notice-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 70px; }
@@ -200,6 +211,13 @@
       .dialog-error { min-height: 23px; margin-top: 9px; color: #a93628; font-size: .82rem; }
       .dialog-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 10px; }
       .dialog-actions .button-secondary { color: var(--ink); border-color: var(--line); }
+      .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+      .form-grid label { margin-top: 0; }
+      .form-grid .full { grid-column: 1 / -1; }
+      .form-control { width: 100%; min-height: 48px; padding: 0 13px; border: 1px solid var(--line); background: white; color: var(--ink); }
+      textarea.form-control { min-height: 78px; padding-top: 11px; resize: vertical; }
+      .form-control:focus { outline: 3px solid rgba(37,189,183,.25); border-color: var(--sea); }
+      .pin-help { margin: 5px 0 0 !important; font-size: .78rem; }
 
       @keyframes settle { from { opacity: .4; transform: scale(1.1); } to { opacity: .82; transform: scale(1.02); } }
       @keyframes marquee { to { transform: translateX(-50%); } }
@@ -234,6 +252,11 @@
         .leg span:last-child { grid-column: 2; }
         .payments .section-head { margin-bottom: 34px; }
         .totals { padding: 24px; }
+        .movements-head { align-items: stretch; flex-direction: column; }
+        .movement { grid-template-columns: 1fr 1fr; }
+        .movement-note, .movement-actions { grid-column: 1 / -1; }
+        .form-grid { grid-template-columns: 1fr; }
+        .form-grid .full { grid-column: auto; }
         .dialog-actions { flex-direction: column-reverse; }
         .dialog-actions .button { width: 100%; }
       }
@@ -368,6 +391,13 @@
                 </table>
               </div>
               <p class="table-note">La fecha límite para completar el pago es el 6 de marzo de 2027 (30 días antes de la salida). Los pagos en pesos se toman a la cotización informada por la agencia.</p>
+              <div class="movements">
+                <div class="movements-head">
+                  <h3>Movimientos</h3>
+                  <button class="button button-primary" type="button" id="addPaymentButton">Agregar pago</button>
+                </div>
+                <div class="movements-list" id="movementsList"></div>
+              </div>
             </div>
           </div>
         </div>
@@ -398,12 +428,30 @@
       </div>
     </footer>
 
+    <dialog id="paymentDialog" aria-labelledby="paymentDialogTitle">
+      <div class="dialog-head"><h3 id="paymentDialogTitle">Agregar pago</h3><button class="icon-button" type="button" id="closePaymentDialog" aria-label="Cerrar">×</button></div>
+      <form class="dialog-body" id="paymentForm">
+        <div class="form-grid">
+          <div><label for="paymentName">Viajero</label><select class="form-control" id="paymentName" required><option>Andy</option><option>Cata</option><option>Tobi</option><option>Vale</option></select></div>
+          <div><label for="paymentAmount">Monto en USD</label><input class="form-control" id="paymentAmount" type="number" min="1" step="1" inputmode="decimal" required /></div>
+          <div><label for="paymentDate">Fecha</label><input class="form-control" id="paymentDate" type="date" required /></div>
+          <div><label for="paymentPin">PIN del grupo</label><input class="form-control" id="paymentPin" type="password" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" autocomplete="one-time-code" required /><p class="pin-help">Se guarda sólo durante esta sesión.</p></div>
+          <div class="full"><label for="paymentNote">Nota</label><textarea class="form-control" id="paymentNote" placeholder="Ej.: segunda entrega"></textarea></div>
+        </div>
+        <input id="paymentId" type="hidden" />
+        <div class="dialog-error" id="paymentError" role="alert"></div>
+        <div class="dialog-actions"><button class="button button-secondary" type="button" id="cancelPaymentDialog">Cancelar</button><button class="button button-primary" type="submit" id="savePaymentButton">Guardar pago</button></div>
+      </form>
+    </dialog>
+
     <script>
       const COST_PER_PERSON = 2480;
+      const TRAVELERS = ["Andy", "Cata", "Tobi", "Vale"];
       const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/17YIMlGoyO4UPnLpPLtsj3FEJUrMXPabewKSyh4MQzZI/export?format=csv&gid=2141116810";
-      const demoRows = ["Viajero 1", "Viajero 2", "Viajero 3", "Viajero 4"].map(name => ({ name, paid: 0, lastDate: "—" }));
+      const demoRecords = TRAVELERS.map((name, index) => ({ id: `roster-${index}`, name, amount: 0, date: "", note: "" }));
       const money = new Intl.NumberFormat("es-AR", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
       const dateFormatter = new Intl.DateTimeFormat("es-AR", { day: "2-digit", month: "short", year: "numeric", timeZone: "UTC" });
+      let currentRecords = [];
 
       function updateCountdown() {
         const target = new Date("2027-04-05T00:00:00-03:00");
@@ -435,6 +483,40 @@
         document.querySelector("#statusText").textContent = connected ? "Sincronizado con Google Sheets" : "Mostrando datos de ejemplo";
       }
 
+      function summarizeRecords(records) {
+        const grouped = new Map(TRAVELERS.map(name => [name, { name, paid: 0, last: null, lastDate: "—" }]));
+        for (const record of records) {
+          if (!grouped.has(record.name)) continue;
+          const current = grouped.get(record.name);
+          current.paid += Number(record.amount) || 0;
+          const parsedDate = record.date ? new Date(`${record.date}T00:00:00Z`) : null;
+          if (parsedDate && !Number.isNaN(parsedDate.valueOf()) && (!current.last || parsedDate > current.last)) {
+            current.last = parsedDate;
+            current.lastDate = dateFormatter.format(parsedDate);
+          }
+        }
+        return [...grouped.values()];
+      }
+
+      function renderMovements(records) {
+        const list = document.querySelector("#movementsList");
+        const payments = records.filter(record => Number(record.amount) > 0).sort((a, b) => String(b.date).localeCompare(String(a.date)));
+        if (!payments.length) {
+          list.innerHTML = '<p class="empty-movements">Todavía no hay pagos cargados. El primero se agrega desde el botón de arriba.</p>';
+          return;
+        }
+        list.innerHTML = payments.map(record => {
+          const date = record.date ? dateFormatter.format(new Date(`${record.date}T00:00:00Z`)) : "Sin fecha";
+          return `<article class="movement"><span class="traveler">${escapeHtml(record.name)}</span><strong>${money.format(record.amount)}</strong><span class="movement-meta">${escapeHtml(date)}</span><span class="movement-meta movement-note">${escapeHtml(record.note || "Sin nota")}</span><span class="movement-actions"><button class="small-button" type="button" data-action="edit" data-id="${escapeHtml(record.id)}">Editar</button><button class="small-button" type="button" data-action="delete" data-id="${escapeHtml(record.id)}">Eliminar</button></span></article>`;
+        }).join("");
+      }
+
+      function applyRecords(records, connected = true) {
+        currentRecords = records;
+        renderPayments(summarizeRecords(records), connected);
+        renderMovements(records);
+      }
+
       function escapeHtml(value) {
         return String(value).replace(/[&<>'"]/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" })[char]);
       }
@@ -458,47 +540,115 @@
 
       function normalize(value) { return String(value || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/g, ""); }
 
-      function aggregateSheet(text) {
+      function recordsFromSheet(text) {
         const rows = parseCsv(text);
         if (rows.length < 2) throw new Error("La hoja está vacía o no tiene filas de pagos.");
         const headers = rows[0].map(normalize);
+        const idIndex = headers.findIndex(h => h === "id");
         const nameIndex = headers.findIndex(h => ["nombre", "viajero", "persona"].includes(h));
         const amountIndex = headers.findIndex(h => ["montousd", "monto", "pagadousd", "pagado", "abonadousd", "abonado"].includes(h));
         const dateIndex = headers.findIndex(h => ["fecha", "fechapago", "ultimopago"].includes(h));
+        const noteIndex = headers.findIndex(h => ["nota", "detalle", "comentario"].includes(h));
         if (nameIndex < 0 || amountIndex < 0) throw new Error("Faltan las columnas Nombre y Monto_USD.");
-        const grouped = new Map();
-        for (const row of rows.slice(1)) {
+        const records = [];
+        for (const [index, row] of rows.slice(1).entries()) {
           const name = (row[nameIndex] || "").trim();
           if (!name) continue;
           const amount = Number(String(row[amountIndex] || "0").replace(/[^0-9,.-]/g, "").replace(",", ".")) || 0;
           const rawDate = dateIndex >= 0 ? (row[dateIndex] || "").trim() : "";
-          const parsedDate = rawDate ? new Date(`${rawDate}T00:00:00Z`) : null;
-          const current = grouped.get(name) || { name, paid: 0, last: null, lastDate: "—" };
-          current.paid += amount;
-          if (parsedDate && !Number.isNaN(parsedDate.valueOf()) && (!current.last || parsedDate > current.last)) {
-            current.last = parsedDate; current.lastDate = dateFormatter.format(parsedDate);
-          }
-          grouped.set(name, current);
+          const localizedDate = rawDate.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+          const date = localizedDate ? `${localizedDate[3]}-${localizedDate[2].padStart(2, "0")}-${localizedDate[1].padStart(2, "0")}` : rawDate;
+          records.push({ id: idIndex >= 0 ? row[idIndex] : `csv-${index}`, name, amount, date, note: noteIndex >= 0 ? row[noteIndex] : "" });
         }
-        if (!grouped.size) throw new Error("No encontré viajeros en la hoja.");
-        return [...grouped.values()];
+        if (!records.length) throw new Error("No encontré viajeros en la hoja.");
+        return records;
       }
 
       async function loadSheet() {
         document.querySelector("#statusText").textContent = "Actualizando desde Google Sheets…";
-        const response = await fetch(SHEET_CSV_URL, { cache: "no-store" });
-        if (!response.ok) throw new Error("No pude leer la hoja. Revisá que esté publicada como CSV.");
-        const rows = aggregateSheet(await response.text());
-        renderPayments(rows, true);
+        try {
+          const apiResponse = await fetch("/api/payments", { cache: "no-store" });
+          if (apiResponse.ok) {
+            const data = await apiResponse.json();
+            if (data.ok && Array.isArray(data.payments)) { applyRecords(data.payments, true); return; }
+          }
+        } catch (_) {}
+        const csvResponse = await fetch(SHEET_CSV_URL, { cache: "no-store" });
+        if (!csvResponse.ok) throw new Error("No pude leer la hoja. Revisá que esté publicada como CSV.");
+        applyRecords(recordsFromSheet(await csvResponse.text()), true);
+      }
+
+      async function mutatePayment(action, payment, pin) {
+        const response = await fetch("/api/payments", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ action, payment, pin }),
+        });
+        const data = await response.json().catch(() => ({ ok: false, error: "La respuesta del servidor no es válida." }));
+        if (!response.ok || !data.ok) throw new Error(data.error || "No se pudo guardar el pago.");
+        sessionStorage.setItem("bayahibePaymentsPin", pin);
+        applyRecords(data.payments, true);
+      }
+
+      const paymentDialog = document.querySelector("#paymentDialog");
+      const paymentForm = document.querySelector("#paymentForm");
+
+      function openPaymentDialog(record = null) {
+        document.querySelector("#paymentDialogTitle").textContent = record ? "Editar pago" : "Agregar pago";
+        document.querySelector("#savePaymentButton").textContent = record ? "Guardar cambios" : "Guardar pago";
+        document.querySelector("#paymentId").value = record ? record.id : "";
+        document.querySelector("#paymentName").value = record ? record.name : TRAVELERS[0];
+        document.querySelector("#paymentAmount").value = record ? record.amount : "";
+        document.querySelector("#paymentDate").value = record ? record.date : new Date().toISOString().slice(0, 10);
+        document.querySelector("#paymentNote").value = record ? record.note : "";
+        document.querySelector("#paymentPin").value = sessionStorage.getItem("bayahibePaymentsPin") || "";
+        document.querySelector("#paymentError").textContent = "";
+        paymentDialog.showModal();
+      }
+
+      async function deletePayment(record) {
+        if (!window.confirm(`¿Eliminar el pago de ${record.name} por ${money.format(record.amount)}?`)) return;
+        const pin = sessionStorage.getItem("bayahibePaymentsPin") || window.prompt("Ingresá el PIN de 6 dígitos del grupo:") || "";
+        if (!pin) return;
+        try { await mutatePayment("delete", { id: record.id }, pin); }
+        catch (error) { window.alert(error.message); }
       }
 
       document.querySelector("#refreshButton").addEventListener("click", async () => {
         try { await loadSheet(); }
         catch (error) { document.querySelector("#statusText").textContent = error.message; }
       });
+      document.querySelector("#addPaymentButton").addEventListener("click", () => openPaymentDialog());
+      ["#closePaymentDialog", "#cancelPaymentDialog"].forEach(selector => document.querySelector(selector).addEventListener("click", () => paymentDialog.close()));
+      document.querySelector("#movementsList").addEventListener("click", event => {
+        const button = event.target.closest("button[data-action]");
+        if (!button) return;
+        const record = currentRecords.find(item => String(item.id) === button.dataset.id);
+        if (!record) return;
+        if (button.dataset.action === "edit") openPaymentDialog(record);
+        if (button.dataset.action === "delete") deletePayment(record);
+      });
+      paymentForm.addEventListener("submit", async event => {
+        event.preventDefault();
+        const id = document.querySelector("#paymentId").value;
+        const payment = {
+          id,
+          name: document.querySelector("#paymentName").value,
+          amount: Number(document.querySelector("#paymentAmount").value),
+          date: document.querySelector("#paymentDate").value,
+          note: document.querySelector("#paymentNote").value.trim(),
+        };
+        const pin = document.querySelector("#paymentPin").value;
+        const errorBox = document.querySelector("#paymentError");
+        const saveButton = document.querySelector("#savePaymentButton");
+        errorBox.textContent = "Guardando…"; saveButton.disabled = true;
+        try { await mutatePayment(id ? "update" : "create", payment, pin); paymentDialog.close(); }
+        catch (error) { errorBox.textContent = error.message; }
+        finally { saveButton.disabled = false; }
+      });
 
       updateCountdown();
-      renderPayments(demoRows);
+      applyRecords(demoRecords, false);
       loadSheet().catch(error => { document.querySelector("#statusText").textContent = error.message; });
     </script>
   </body>
